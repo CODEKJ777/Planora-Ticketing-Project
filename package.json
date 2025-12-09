@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/package",
+  "name": "astro-ticketing",
+  "version": "0.1.0",
+  "private": true,
+  "author": "Kalidas KJ",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "test": "echo \"No tests configured\" && exit 0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.27.0",
+    "framer-motion": "10.12.16",
+    "next": "^16.0.8",
+    "nodemailer": "^7.0.11",
+    "pdfkit": "0.13.0",
+    "qrcode": "1.5.1",
+    "razorpay": "2.9.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "tailwindcss": "3.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.5",
+    "autoprefixer": "10.4.20",
+    "baseline-browser-mapping": "^2.9.5",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "16.0.3",
+    "postcss": "8.5.6",
+    "typescript": "5.5.4"
+  },
+  "overrides": {
+    "glob": "10.5.0",
+    "js-yaml": "4.1.1"
+  }
+}
