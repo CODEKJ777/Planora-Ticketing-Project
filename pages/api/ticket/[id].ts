@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { createClient } from '@supabase/supabase-js'
 
 // use service key on server so we can generate signed URLs
-const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_KEY || '')
+const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_KEY || 'sb_publishable_A2-b3mUEim_YMeXFFzwO3w_3jEaZRwp')
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query
