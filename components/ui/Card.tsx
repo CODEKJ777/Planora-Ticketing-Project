@@ -1,32 +1,32 @@
-import { motion } from 'framer-motion'
-import { cn } from '../../lib/utils'
+import { motion, HTMLMotionProps } from 'framer-motion'
 import { ReactNode } from 'react'
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
-interface CardProps {
-    children: ReactNode
-    className?: string
-    hoverEffect?: boolean
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs))
 }
 
-export function Card({ children, className = '', hoverEffect = false }: CardProps) {
-    const baseClasses = 'rounded-2xl p-6 border border-white/10 backdrop-blur-sm'
+interface CardProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
+    hoverEffect?: boolean
+    children?: ReactNode
+}
 
-    if (!hoverEffect) {
-        return (
-            <div className={cn(baseClasses, className)}>
-                {children}
-            </div>
-        )
-    }
-
+export function Card({ className, hoverEffect = false, children, ...props }: CardProps) {
     return (
         <motion.div
-            whileHover={{ y: -4 }}
-            transition={{ duration: 0.2 }}
-            className={cn(baseClasses, 'relative overflow-hidden', className)}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            whileHover={hoverEffect ? { y: -5, boxShadow: '0 20px 40px -15px rgba(112,0,255,0.2)' } : undefined}
+            className={cn(
+                'relative overflow-hidden rounded-2xl bg-surface border border-white/10 backdrop-blur-xl p-6 transition-all duration-300',
+                className
+            )}
+            {...props}
         >
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 pointer-events-none transition-opacity duration-500 hover:opacity-100" />
-            <div className="relative z-10">{children}</div>
+            {children}
         </motion.div>
     )
 }

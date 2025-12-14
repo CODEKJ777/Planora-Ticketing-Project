@@ -35,7 +35,7 @@ export default function EventPage() {
   useEffect(() => {
     if (!id) return
     supabase.from('events').select('*').eq('id', id).single()
-      .then(({ data, error }) => {
+      .then(({ data, error }: { data: any; error: any }) => {
         if (error) console.error(error)
         else setEvent(data)
       })
