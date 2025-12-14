@@ -8,20 +8,45 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'navy-900': '#0a192f',
-        'navy-800': '#112240',
-        'accent-blue': '#2563eb',
-        'grad-start': '#0f172a',
-        'grad-end': '#1e3a8a'
-      },
-      borderRadius: {
-        '2xl': '1rem'
+        background: '#030014', // Deep cosmic dark
+        primary: {
+          DEFAULT: '#7000FF', // Electric Violet
+          foreground: '#ffffff',
+        },
+        secondary: {
+          DEFAULT: '#00C2FF', // Cyan
+          foreground: '#030014',
+        },
+        accent: {
+          DEFAULT: '#FF0055', // Neon Pink
+          foreground: '#ffffff',
+        },
+        surface: {
+          DEFAULT: 'rgba(255, 255, 255, 0.05)',
+          hover: 'rgba(255, 255, 255, 0.1)',
+        }
       },
       fontFamily: {
-        sans: ['Inter', 'Poppins', 'ui-sans-serif', 'system-ui']
+        sans: ['Outfit', 'Inter', 'sans-serif'],
+        display: ['Orbitron', 'sans-serif'], // For headings
       },
-      boxShadow: {
-        'soft-lg': '0 10px 30px rgba(2,6,23,0.6), 0 2px 6px rgba(2,6,23,0.4)'
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'cosmic-gradient': 'linear-gradient(to right, #7000FF, #00C2FF)',
+      },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-glow': 'pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        'pulse-glow': {
+          '0%, 100%': { opacity: 1, filter: 'brightness(1.2)' },
+          '50%': { opacity: .7, filter: 'brightness(0.8)' },
+        }
       }
     }
   },

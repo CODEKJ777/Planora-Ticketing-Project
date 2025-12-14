@@ -42,7 +42,13 @@ async function uploadPdfAndGetUrl(id: string, pdfBuffer: Buffer, ticketId: strin
   return (await createSignedPdfUrl(id, ticketId)) || `${process.env.BASE_URL || 'http://localhost:3000'}/ticket/${id}`
 }
 
-const transporter = getTransport()
+let transporter: any = null
+
+function getMailer() {
+  if (transporter) return transporter
+  transporter = getTransport()
+  return transporter
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
@@ -94,6 +100,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         name,
         email,
         user_id: metadata?.user_id || null,
+        event_id: metadata?.eventId || null,
         payment_id: paymentId,
         qr: qrSvg,
         created_at: new Date(),
@@ -106,8 +113,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // generate PDF in-memory
     const doc = new PDFDocument({ size: 'A4', margin: 50 })
-    const stream = new PassThrough()
+    // collect buffer
     const buffers: any[] = []
+    const stream = new PassThrough()
+    stream.on('data', (chunk) => buffers.push(chunk))
+
     doc.pipe(stream)
     doc.fontSize(20).text('Event Ticket', { align: 'center' })
     doc.moveDown()
@@ -116,21 +126,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     doc.text(`Ticket ID: ${id}`)
     doc.moveDown()
     if (qrSvg.startsWith('data:image')) {
-      const base64 = qrSvg.split(',')[1]
-      const img = Buffer.from(base64, 'base64')
-      try { doc.image(img, { fit: [200,200], align: 'center' }) } catch(e) { logError('pdf image error', { error: e }) }
+      try {
+        const base64 = qrSvg.split(',')[1]
+        if (!base64) throw new Error('Invalid base64 data')
+        const img = Buffer.from(base64, 'base64')
+        if (img.length === 0) throw new Error('Empty image data')
+        doc.image(img, { fit: [200, 200], align: 'center' })
+      } catch (e) { logError('pdf image error', { error: e }) }
     }
     doc.end()
 
-    // collect buffer
-    stream.on('data', (chunk) => buffers.push(chunk))
     await new Promise<void>((resolve) => stream.on('end', () => resolve()))
     const pdfBuffer = Buffer.concat(buffers)
 
     const pdfUrl = await uploadPdfAndGetUrl(ticketId, pdfBuffer, ticketId)
 
     // send email via SMTP with inline QR and signed download link
-    await transporter.sendMail({
+    await getMailer().sendMail({
       from: process.env.EMAIL_FROM || 'noreply@example.com',
       to: email,
       subject: 'Your Ticket',

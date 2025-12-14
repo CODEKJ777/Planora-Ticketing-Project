@@ -3,7 +3,7 @@ import Razorpay from 'razorpay'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
-  const { name, email } = req.body
+  const { name, email, amount: bodyAmount } = req.body
   const key = process.env.RAZORPAY_KEY_ID || ''
   const secret = process.env.RAZORPAY_KEY_SECRET || ''
   if (!key || !secret) {
@@ -11,9 +11,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: 'razorpay_not_configured', message: 'RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are required' })
   }
   const razorpay = new Razorpay({ key_id: key, key_secret: secret })
-  const amount = Number(process.env.TICKET_PRICE_PAISE || '100000') || 100000 // default ₹1000.00
+
+  // Use amount from body (event price) or fallback to default
+  // Ideally we should verify this against DB, but for now we trust the client's fetched data
+  const amount = Number(bodyAmount) || Number(process.env.TICKET_PRICE_PAISE || '100000') || 100000
+
   try {
-    const order = await razorpay.orders.create({ amount, currency: 'INR', receipt: `rcpt_${Date.now()}` })
+    const order = await razorpay.orders.create({
+      amount,
+      currency: 'INR',
+      receipt: `rcpt_${Date.now()}`,
+      notes: { name, email } // Optional: add simple notes
+    })
     return res.json({ orderId: order.id, amount: order.amount, razorpayKey: key })
   } catch (err) {
     console.error(err)

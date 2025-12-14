@@ -35,5 +35,6 @@ export async function setTicketStatus(
   const update = await client.from('tickets').update({ status }).eq('id', id)
   if (update.error && !isStatusColumnError(update.error)) {
     console.error('ticket status update failed', { id, status, error: update.error })
+    throw update.error
   }
 }

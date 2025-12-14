@@ -1,7 +1,10 @@
 import crypto from 'crypto'
 
 const COOKIE_NAME = 'admin_session'
-const DEFAULT_TTL_SECONDS = Number(process.env.ADMIN_SESSION_TTL || 3600)
+const DEFAULT_TTL_SECONDS = (() => {
+  const ttl = Number(process.env.ADMIN_SESSION_TTL || 3600)
+  return Number.isFinite(ttl) && ttl > 0 ? ttl : 3600
+})()
 
 function getSecret() {
   const secret = process.env.ADMIN_SECRET

@@ -29,10 +29,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   doc.moveDown()
 
   if (imgData.startsWith('data:image')) {
-    const base64 = imgData.split(',')[1]
-    const img = Buffer.from(base64, 'base64')
-    // place QR
     try {
+      const base64 = imgData.split(',')[1]
+      if (!base64) throw new Error('Invalid base64 data')
+      const img = Buffer.from(base64, 'base64')
+      if (img.length === 0) throw new Error('Empty image data')
       doc.image(img, { fit: [200, 200], align: 'center' })
     } catch (e) {
       console.error('pdf image error', e)

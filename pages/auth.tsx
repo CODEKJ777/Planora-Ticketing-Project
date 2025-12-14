@@ -1,29 +1,45 @@
 import { useState } from 'react'
 import supabase from '../lib/supabaseClient'
 import { motion } from 'framer-motion'
+import { Card } from '../components/ui/Card'
+import { Input } from '../components/ui/Input'
+import { Button } from '../components/ui/Button'
+import { toast } from 'react-hot-toast'
 
 export default function AuthPage() {
   const [email, setEmail] = useState('')
-  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
 
   async function signInWithEmail(e: any) {
     e.preventDefault()
-    setMessage('')
+    setLoading(true)
     const { error } = await supabase.auth.signInWithOtp({ email })
-    if (error) setMessage(error.message)
-    else setMessage('Check your email for the login link (magic link)')
+    setLoading(false)
+    if (error) toast.error(error.message)
+    else toast.success('Check your email for the magic link!')
   }
 
   return (
-    <div className="max-w-md mx-auto">
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card glass p-6">
-        <h1 className="text-2xl font-medium text-white">Sign in / Sign up</h1>
-        <form onSubmit={signInWithEmail} className="mt-4 space-y-3">
-          <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" className="w-full p-2 bg-transparent border border-white/6 rounded-md text-white" />
-          <button className="w-full btn-primary">Send magic link</button>
+    <div className="min-h-[60vh] flex items-center justify-center p-4">
+      <Card className="p-8 w-full max-w-md space-y-6 glass-card">
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-display font-bold">Sign In</h1>
+          <p className="text-sm text-slate-400">Access your tickets via magic link.</p>
+        </div>
+
+        <form onSubmit={signInWithEmail} className="space-y-4">
+          <Input
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            type="email"
+            label="Email Address"
+          />
+          <Button isLoading={loading} className="w-full" variant="cosmic">
+            Send Login Link
+          </Button>
         </form>
-        {message && <p className="mt-2 text-sm text-green-300">{message}</p>}
-      </motion.div>
+      </Card>
     </div>
   )
 }
