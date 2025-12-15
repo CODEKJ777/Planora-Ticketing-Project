@@ -144,9 +144,9 @@ export default function AdminPage() {
                 layout
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-surface hover:bg-surface-hover border border-white/5 rounded-xl p-4 flex items-center justify-between transition-colors"
+                className="bg-surface hover:bg-surface-hover border border-white/5 rounded-xl p-4 flex items-start justify-between transition-colors"
               >
-                <div className="space-y-1">
+                <div className="space-y-2 text-sm text-slate-300">
                   <div className="flex items-center gap-3">
                     <span className="font-mono text-xs text-primary bg-primary/10 px-2 py-0.5 rounded">{t.id}</span>
                     <span className={`text-xs px-2 py-0.5 rounded uppercase font-bold ${t.used ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400'}`}>
@@ -154,7 +154,12 @@ export default function AdminPage() {
                     </span>
                   </div>
                   <div className="font-medium text-white">{t.name}</div>
-                  <div className="text-sm text-slate-400">{t.email}</div>
+                  <div className="text-slate-400">{t.email}</div>
+                  <div className="flex flex-wrap gap-3 text-xs text-slate-400">
+                    {t.phone && <span className="px-2 py-0.5 rounded bg-white/5">📞 {t.phone}</span>}
+                    {t.college && <span className="px-2 py-0.5 rounded bg-white/5">🏫 {t.college}</span>}
+                    {t.ieee && <span className="px-2 py-0.5 rounded bg-white/5">IEEE: {t.ieee}</span>}
+                  </div>
                 </div>
                 <div>
                   <Button onClick={() => toggle(t.id)} variant="ghost" className="h-9 text-xs">
