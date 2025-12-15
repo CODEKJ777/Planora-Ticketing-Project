@@ -21,6 +21,7 @@ export default function Header() {
           <Link href="/my-tickets" className="text-strong hover:text-white">My Tickets</Link>
           <Link href="/verify" className="text-strong hover:text-white">Verify</Link>
           <Link href="/admin" className="text-strong hover:text-white">Admin</Link>
+          <Link href="/events" className="text-strong hover:text-white">Events</Link>
         </nav>
       </div>
     </header>

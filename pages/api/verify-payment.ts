@@ -65,6 +65,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const name = (metadata?.name || '').trim()
   const email = (metadata?.email || '').trim()
+  const phone = (metadata?.phone || '').trim()
+  const college = (metadata?.college || '').trim()
+  const ieee = (metadata?.ieee || '').trim()
   if (!name || !email) return res.status(400).json({ error: 'missing_user_details' })
 
   const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
@@ -99,6 +102,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         id,
         name,
         email,
+        phone,
+        college,
+        ieee,
         user_id: metadata?.user_id || null,
         event_id: metadata?.eventId || null,
         payment_id: paymentId,

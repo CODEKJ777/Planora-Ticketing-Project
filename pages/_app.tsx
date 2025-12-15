@@ -1,16 +1,13 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import Script from 'next/script'
 import Layout from '../components/Layout'
-
 import { Toaster } from 'react-hot-toast'
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps }: AppProps) {
+  const gpt5Enabled = process.env.NEXT_PUBLIC_ENABLE_GPT5 === 'true'
   return (
     <Layout>
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
-      <Script src="https://unpkg.com/html5-qrcode@2.3.9/minified/html5-qrcode.min.js" strategy="afterInteractive" />
-      <Component {...pageProps} />
+      <Component {...pageProps} gpt5Enabled={gpt5Enabled} />
       <Toaster
         position="top-center"
         toastOptions={{
