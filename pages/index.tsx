@@ -23,10 +23,10 @@ export default function LandingPage() {
                         When planning gets effortless, great events happen. Planora Tickets has you covered with powerful tools to host, manage, and execute memorable experiences seamlessly.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-                        <Link href="/dashboard">
+                        <Link href="/host">
                             <Button variant="cosmic" className="h-14 px-8 text-lg">Host Now <ArrowRight className="ml-2" /></Button>
                         </Link>
-                        <Link href="/explore">
+                        <Link href="/events">
                             <Button variant="outline" className="h-14 px-8 text-lg">Explore Events</Button>
                         </Link>
                     </div>

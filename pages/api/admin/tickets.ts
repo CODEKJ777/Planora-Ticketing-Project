@@ -28,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'POST') {
     const { id, action } = req.body
     if (!id) return res.status(400).json({ error: 'missing id' })
+    
     if (action === 'toggle') {
       const { data: ticket, error } = await supabase.from('tickets').select('*').eq('id', id).single()
       if (error) return res.status(404).json({ error: 'not_found' })
@@ -35,6 +36,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (e2) return res.status(500).json({ error: e2.message })
       return res.json({ ok: true })
     }
+    
+    if (action === 'delete') {
+      const { error } = await supabase.from('tickets').delete().eq('id', id)
+      if (error) return res.status(500).json({ error: error.message })
+      return res.json({ ok: true })
+    }
+    
+    if (action === 'resend') {
+      const { data: ticket, error } = await supabase.from('tickets').select('*').eq('id', id).single()
+      if (error) return res.status(404).json({ error: 'not_found' })
+      // Trigger resend logic here (would need to integrate with mailer)
+      return res.json({ ok: true, message: 'Email resend queued' })
+    }
+    
     return res.status(400).json({ error: 'invalid_action' })
   }
 

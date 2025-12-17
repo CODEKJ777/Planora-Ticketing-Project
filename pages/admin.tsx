@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
-import { ShieldCheck, LogOut, Search, CheckCircle, XCircle } from 'lucide-react'
+import { ShieldCheck, LogOut, Search, CheckCircle, XCircle, Trash2, Mail, Download, TrendingUp, Users, DollarSign } from 'lucide-react'
 
 type AuthState = 'unknown' | 'authenticated' | 'unauthenticated'
 
@@ -14,6 +14,8 @@ export default function AdminPage() {
   const [tickets, setTickets] = useState<any[]>([])
   const [authState, setAuthState] = useState<AuthState>('unknown')
   const [loading, setLoading] = useState(false)
+  const [stats, setStats] = useState<any>(null)
+  const [eventFilter, setEventFilter] = useState('AKCOMSOC2025')
   const isAuthed = authState === 'authenticated'
 
   const search = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
@@ -21,7 +23,7 @@ export default function AdminPage() {
     if (!isAuthed) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/admin/tickets?q=${encodeURIComponent(q)}`)
+      const res = await fetch(`/api/admin/tickets?q=${encodeURIComponent(q)}&eventId=${encodeURIComponent(eventFilter)}`)
       if (!res.ok) {
         if (res.status === 403) setAuthState('unauthenticated')
         return
@@ -31,22 +33,39 @@ export default function AdminPage() {
     } finally {
       setLoading(false)
     }
-  }, [isAuthed, q])
+  }, [isAuthed, q, eventFilter])
+
+  const loadStats = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/admin/stats?eventId=${encodeURIComponent(eventFilter)}`)
+      if (res.ok) {
+        const data = await res.json()
+        setStats(data)
+      }
+    } catch (err) {
+      console.error('Stats error', err)
+    }
+  }, [eventFilter])
 
   const checkSession = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/session')
       const data = await res.json()
       setAuthState(data?.authenticated ? 'authenticated' : 'unauthenticated')
-      if (data?.authenticated) await search()
-      else setTickets([])
+      if (data?.authenticated) {
+        await search()
+        await loadStats()
+      } else {
+        setTickets([])
+      }
     } catch (err) {
       console.error(err)
       setAuthState('unauthenticated')
     }
-  }, [search])
+  }, [search, loadStats])
 
   useEffect(() => { checkSession() }, [checkSession])
+  useEffect(() => { if (isAuthed) { search(); loadStats() } }, [eventFilter, isAuthed])
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -81,7 +100,62 @@ export default function AdminPage() {
       return
     }
     await search()
+    await loadStats()
     toast.success('Status updated')
+  }
+
+  async function deleteTicket(id: string) {
+    if (!isAuthed) return
+    if (!confirm('Delete this ticket? This cannot be undone.')) return
+    const res = await fetch('/api/admin/tickets', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, action: 'delete' }) })
+    if (res.status === 403) {
+      setAuthState('unauthenticated')
+      return
+    }
+    if (res.ok) {
+      await search()
+      await loadStats()
+      toast.success('Ticket deleted')
+    } else {
+      toast.error('Delete failed')
+    }
+  }
+
+  async function resendEmail(id: string) {
+    if (!isAuthed) return
+    const res = await fetch('/api/admin/tickets', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, action: 'resend' }) })
+    if (res.ok) {
+      toast.success('Email resend queued')
+    } else {
+      toast.error('Resend failed')
+    }
+  }
+
+  function exportCSV() {
+    if (tickets.length === 0) {
+      toast.error('No tickets to export')
+      return
+    }
+    const headers = ['ID', 'Name', 'Email', 'Phone', 'College', 'IEEE', 'Status', 'Used', 'Created']
+    const rows = tickets.map(t => [
+      t.id,
+      t.name,
+      t.email,
+      t.phone || '',
+      t.college || '',
+      t.ieee || '',
+      t.status || '',
+      t.used ? 'Yes' : 'No',
+      new Date(t.created_at).toLocaleString()
+    ])
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `tickets-${Date.now()}.csv`
+    a.click()
+    toast.success('CSV exported')
   }
 
   return (
@@ -118,6 +192,80 @@ export default function AdminPage() {
         </div>
       ) : (
         <div className="space-y-6">
+          {/* Event Tabs */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setEventFilter('AKCOMSOC2025')}
+              className={`px-4 py-2 rounded-lg font-semibold transition ${
+                eventFilter === 'AKCOMSOC2025'
+                  ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white'
+                  : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
+              }`}
+            >
+              AKCOMSOC 2025
+            </button>
+            <button
+              onClick={() => setEventFilter('ALL')}
+              className={`px-4 py-2 rounded-lg font-semibold transition ${
+                eventFilter === 'ALL'
+                  ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white'
+                  : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
+              }`}
+            >
+              All Events
+            </button>
+          </div>
+
+          {/* Stats Cards */}
+          {stats && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="p-4 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 border-violet-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-violet-500/20 rounded-lg">
+                    <Users className="w-5 h-5 text-violet-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{stats.total}</div>
+                    <div className="text-xs text-slate-400">Registrations</div>
+                  </div>
+                </div>
+              </Card>
+              <Card className="p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-500/20 rounded-lg">
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{stats.issued}</div>
+                    <div className="text-xs text-slate-400">Tickets Issued</div>
+                  </div>
+                </div>
+              </Card>
+              <Card className="p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-500/20 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{stats.pending}</div>
+                    <div className="text-xs text-slate-400">Pending</div>
+                  </div>
+                </div>
+              </Card>
+              <Card className="p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-500/20 rounded-lg">
+                    <DollarSign className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">₹{stats.revenue.toLocaleString()}</div>
+                    <div className="text-xs text-slate-400">Revenue</div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+
           <Card className="p-6 bg-white/5 border-white/5">
             <form onSubmit={search} className="flex gap-4">
               <div className="flex-1">
@@ -130,6 +278,9 @@ export default function AdminPage() {
               </div>
               <Button isLoading={loading} variant="primary" className="w-32">
                 <Search className="w-4 h-4 mr-2" /> Search
+              </Button>
+              <Button onClick={exportCSV} variant="ghost" type="button" className="w-32">
+                <Download className="w-4 h-4 mr-2" /> Export
               </Button>
             </form>
           </Card>
@@ -161,9 +312,15 @@ export default function AdminPage() {
                     {t.ieee && <span className="px-2 py-0.5 rounded bg-white/5">IEEE: {t.ieee}</span>}
                   </div>
                 </div>
-                <div>
-                  <Button onClick={() => toggle(t.id)} variant="ghost" className="h-9 text-xs">
+                <div className="flex gap-2">
+                  <Button onClick={() => toggle(t.id)} variant="ghost" className="h-9 text-xs px-3">
                     {t.used ? 'Mark Valid' : 'Mark Used'}
+                  </Button>
+                  <Button onClick={() => resendEmail(t.id)} variant="ghost" className="h-9 px-2" title="Resend Email">
+                    <Mail className="w-4 h-4 text-blue-400" />
+                  </Button>
+                  <Button onClick={() => deleteTicket(t.id)} variant="ghost" className="h-9 px-2" title="Delete Ticket">
+                    <Trash2 className="w-4 h-4 text-red-400" />
                   </Button>
                 </div>
               </motion.div>

@@ -1,5 +1,6 @@
 import Header from './Header'
 import SpaceBackground from './SpaceBackground'
+import Chatbot from './Chatbot'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,6 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="text-6xl font-extrabold text-white/20">PLANORA</div>
         </div>
       </div>
+      <Chatbot />
     </div>
   )
 }
