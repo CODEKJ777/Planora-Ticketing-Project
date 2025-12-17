@@ -85,10 +85,20 @@ export default function AKCOMSOC2025Page() {
             })
             const v = await verifyRes.json()
             if (verifyRes.ok && v.ticketUrl) {
-              toast.success('Payment successful! Redirecting to your ticket...')
-              window.location.href = v.ticketUrl
+              toast.success('🎉 Registration Successful! Check your email for ticket details.', {
+                duration: 5000,
+                style: {
+                  background: '#10b981',
+                  color: '#fff',
+                  fontSize: '16px',
+                  padding: '16px'
+                }
+              })
+              setTimeout(() => {
+                window.location.href = v.ticketUrl
+              }, 2000)
             } else {
-              toast.error('Payment verified but ticket generation failed')
+              toast.error(`Payment verification failed: ${v.error || 'Unknown error'}`)
             }
           } catch (err) {
             toast.error('Verification failed')

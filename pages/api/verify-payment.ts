@@ -90,30 +90,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // create ticket record in Supabase
-  let ticketId = `TICKET_${Date.now()}`
+  let ticketId: string = ''
   let insertedTicket: any | null = null
   try {
-    const id = ticketId
-    const qrData = `${id}|${email}`
+    // Let Supabase generate UUID, then create QR with it
+    const tempTicket = await supabase.from('tickets').insert([{
+      name,
+      email,
+      phone,
+      college,
+      ieee,
+      event_id: metadata?.eventId || null,
+      payment_id: paymentId,
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      amount_paid: metadata?.amount || null,
+      status: 'pending',
+      created_at: new Date(),
+    }]).select().single()
+    
+    if (tempTicket.error) throw tempTicket.error
+    
+    ticketId = tempTicket.data.id
+    const qrData = `${ticketId}|${email}`
     const qrSvg = await QRCode.toDataURL(qrData)
-    insertedTicket = await insertTicketWithStatus(
-      supabase,
-      {
-        id,
-        name,
-        email,
-        phone,
-        college,
-        ieee,
-        user_id: metadata?.user_id || null,
-        event_id: metadata?.eventId || null,
-        payment_id: paymentId,
-        qr: qrSvg,
-        created_at: new Date(),
-      },
-      'pending'
-    )
-    ticketId = insertedTicket?.id || id
+    
+    // Update ticket with QR code
+    const { data: updatedTicket, error: updateError } = await supabase
+      .from('tickets')
+      .update({ qr: qrSvg })
+      .eq('id', ticketId)
+      .select()
+      .single()
+    
+    if (updateError) throw updateError
+    insertedTicket = updatedTicket
     // send email with ticket link and attach PDF
     const ticketUrl = `${baseUrl}/ticket/${ticketId}`
 
@@ -129,7 +141,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     doc.moveDown()
     doc.fontSize(14).text(`Name: ${metadata?.name}`)
     doc.text(`Email: ${metadata?.email}`)
-    doc.text(`Ticket ID: ${id}`)
+    doc.text(`Ticket ID: ${ticketId}`)
     doc.moveDown()
     if (qrSvg.startsWith('data:image')) {
       try {
@@ -148,23 +160,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const pdfUrl = await uploadPdfAndGetUrl(ticketId, pdfBuffer, ticketId)
 
     // send email via SMTP with inline QR and signed download link
-    await getMailer().sendMail({
-      from: process.env.EMAIL_FROM || 'noreply@example.com',
-      to: email,
-      subject: 'Your Ticket',
-      html: `
-        <div style="font-family: Arial, sans-serif; font-size:14px; color:#111">
-          <p>Hi ${name},</p>
-          <p>Thanks for your purchase. Your ticket is ready — open it here: <a href="${ticketUrl}">View Ticket</a></p>
-          <p><img src="${qrSvg}" alt="QR" style="width:200px;height:200px"/></p>
-          <p>You can download a printable PDF here: <a href="${pdfUrl}">Download ticket PDF</a></p>
-          <p>Show this QR at entry.</p>
-        </div>
-      `,
-    })
+    try {
+      await getMailer().sendMail({
+        from: process.env.EMAIL_FROM || 'noreply@example.com',
+        to: email,
+        subject: 'Your Ticket',
+        html: `
+          <div style="font-family: Arial, sans-serif; font-size:14px; color:#111">
+            <p>Hi ${name},</p>
+            <p>Thanks for your purchase. Your ticket is ready — open it here: <a href="${ticketUrl}">View Ticket</a></p>
+            <p><img src="${qrSvg}" alt="QR" style="width:200px;height:200px"/></p>
+            <p>You can download a printable PDF here: <a href="${pdfUrl}">Download ticket PDF</a></p>
+            <p>Show this QR at entry.</p>
+          </div>
+        `,
+      })
+      logInfo('ticket email sent', { ticketId, email })
+    } catch (emailErr) {
+      logWarn('email sending failed, but ticket still issued', { ticketId, email, error: (emailErr as Error)?.message })
+    }
+    
     await setTicketStatus(supabase, ticketId, 'issued')
     logInfo('ticket issued', { ticketId, paymentId, email })
-    return res.json({ ticketUrl, pdfUrl })
+    return res.json({
+      ticketUrl,
+      pdfUrl,
+      ticketId,
+      message: 'Successfully registered for the event. Your ticket has been emailed.'
+    })
   } catch (err) {
     logError('ticket issuance failed', { ticketId, paymentId, error: (err as Error)?.message })
     if (ticketId && insertedTicket?.id) {

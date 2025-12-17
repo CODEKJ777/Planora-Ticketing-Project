@@ -85,10 +85,19 @@ export default function EventPage() {
             })
             const v = await verify.json()
             if (v?.ticketUrl) {
-              toast.success('Ticket Issued! Redirecting...', { id: toastId })
-              setTimeout(() => window.location.href = v.ticketUrl, 1500)
+              toast.success('🎉 Registration Successful! Check your email for ticket details.', { 
+                id: toastId,
+                duration: 5000,
+                style: {
+                  background: '#10b981',
+                  color: '#fff',
+                  fontSize: '16px',
+                  padding: '16px'
+                }
+              })
+              setTimeout(() => window.location.href = v.ticketUrl, 2000)
             } else {
-              toast.error('Payment verified but ticket generation failed', { id: toastId })
+              toast.error(`Payment verification failed: ${v.error || 'Unknown error'}`, { id: toastId })
             }
           }
         }

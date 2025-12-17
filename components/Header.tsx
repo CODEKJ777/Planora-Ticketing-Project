@@ -16,12 +16,11 @@ export default function Header() {
         </Link>
 
         <nav className="space-x-4 text-sm">
-          <Link href="/explore" className="text-strong hover:text-white">Explore</Link>
           <Link href="/" className="text-strong hover:text-white">Home</Link>
+          <Link href="/events" className="text-strong hover:text-white">Events</Link>
           <Link href="/my-tickets" className="text-strong hover:text-white">My Tickets</Link>
           <Link href="/verify" className="text-strong hover:text-white">Verify</Link>
           <Link href="/admin" className="text-strong hover:text-white">Admin</Link>
-          <Link href="/events" className="text-strong hover:text-white">Events</Link>
         </nav>
       </div>
     </header>
