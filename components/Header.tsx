@@ -10,8 +10,8 @@ export default function Header() {
             ET
           </motion.div>
           <div>
-            <div className="text-lg font-medium leading-none text-white">Event Tickets</div>
-            <div className="text-xs text-strong-accent flex items-center gap-2">Simple, fast, elegant <span className="px-2 py-0.5 text-[10px] rounded-full bg-white/6 text-strong">PLANORA</span></div>
+            <div className="text-lg font-medium leading-none text-white">Planora</div>
+            <div className="text-xs text-strong-accent flex items-center gap-2"> <span className="px-2 py-0.5 text-[10px] rounded-full bg-white/6 text-strong">PLANORA</span></div>
           </div>
         </Link>
 
