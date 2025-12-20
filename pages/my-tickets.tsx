@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 
 export default function MyTickets() {
+  const router = useRouter()
   const [tickets, setTickets] = useState<any[]>([])
   const [loading] = useState(false)
   const [emailLookup, setEmailLookup] = useState('')
@@ -49,13 +51,12 @@ export default function MyTickets() {
       const data = await res.json()
       if (!res.ok) return toast.error(data?.error || 'Invalid OTP')
       setOtpToken(data.token)
-      toast.success('Verified')
-      // fetch tickets
-      const res2 = await fetch('/api/tickets-by-email', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-otp-token': data.token }, body: JSON.stringify({ email }) })
-      const d2 = await res2.json()
-      if (!res2.ok) return toast.error(d2?.error || 'Lookup failed')
-      setLookupResults(d2.tickets || [])
-      if ((d2.tickets || []).length === 0) toast('No tickets found for that email')
+      toast.success('Verified! Redirecting to your tickets...')
+      
+      // Redirect to ticket success page with email and token as query parameters
+      setTimeout(() => {
+        router.push(`/ticket-success?email=${encodeURIComponent(email)}&token=${encodeURIComponent(data.token)}`)
+      }, 500)
     } catch { toast.error('Verification failed') }
   }
 

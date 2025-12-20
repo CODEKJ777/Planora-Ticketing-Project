@@ -21,6 +21,7 @@ export default function Verify() {
   const [showHistory, setShowHistory] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [scriptLoaded, setScriptLoaded] = useState(false)
+  const [scanCooldown, setScanCooldown] = useState(0)
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -136,6 +137,16 @@ export default function Verify() {
     }
   }, [])
 
+  // Scan cooldown timer effect
+  useEffect(() => {
+    if (scanCooldown > 0) {
+      const timer = setInterval(() => {
+        setScanCooldown(c => Math.max(0, c - 1))
+      }, 1000)
+      return () => clearInterval(timer)
+    }
+  }, [scanCooldown])
+
   useEffect(() => {
     if (!isAuthenticated) return
     if (!scanning) return
@@ -159,6 +170,11 @@ export default function Verify() {
             cameraId, 
             { fps: 10, qrbox: { width: 250, height: 250 } }, 
             async (decodedText: string) => {
+              // Skip scan if still on cooldown
+              if (scanCooldown > 0) {
+                return
+              }
+
               const toastId = toast.loading('Verifying ticket...')
               try {
                 const res = await fetch('/api/verify-ticket', {
@@ -203,6 +219,9 @@ export default function Verify() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ticketId: result.id })
                   })
+                  
+                  // Set cooldown after successful scan
+                  setScanCooldown(3)
                 } else {
                   const scanData = {
                     valid: false,
@@ -229,12 +248,15 @@ export default function Verify() {
                       color: '#fff'
                     }
                   })
+                  
+                  // Set longer cooldown for invalid tickets (5 seconds)
+                  setScanCooldown(5)
                 }
               } catch (e) {
                 toast.error('Verification failed', { id: toastId })
+                // Set cooldown even on error
+                setScanCooldown(3)
               }
-              
-              await new Promise(resolve => setTimeout(resolve, 2000))
             },
             (errorMessage: string) => {}
           )
@@ -254,7 +276,7 @@ export default function Verify() {
         } catch (e) {}
       }
     }
-  }, [isAuthenticated, soundEnabled, scanning, playSound])
+  }, [isAuthenticated, soundEnabled, scanning, playSound, scanCooldown])
 
   const handleStartScanning = async () => {
     try {
@@ -421,6 +443,21 @@ export default function Verify() {
                 <span>Status: {scanning ? 'Camera active' : 'Tap Start to scan'}</span>
                 <span className="text-slate-500">Hold steady for best results</span>
               </div>
+              
+              {/* Scan Cooldown Indicator */}
+              {scanCooldown > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-3 p-3 rounded-lg bg-amber-500/20 border border-amber-500/50 flex items-center gap-2"
+                >
+                  <Clock className="w-4 h-4 text-amber-400" />
+                  <span className="text-sm text-amber-300">
+                    Scanner paused for {scanCooldown} second{scanCooldown !== 1 ? 's' : ''} - Please wait
+                  </span>
+                </motion.div>
+              )}
+              
               <div className="rounded-xl overflow-hidden border-2 border-violet-500/30 bg-black">
                 <div id="reader" style={{ width: '100%' }} />
               </div>

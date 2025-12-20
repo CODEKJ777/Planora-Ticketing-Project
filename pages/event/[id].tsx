@@ -157,7 +157,7 @@ export default function EventRegistrationPage() {
               
               setTimeout(() => {
                 if (ticketId) {
-                  router.push(`/ticket/${ticketId}`)
+                  router.push(`/payment-success?ticketId=${encodeURIComponent(ticketId)}&eventId=${encodeURIComponent(event.id)}`)
                 } else {
                   router.push('/my-tickets')
                 }
