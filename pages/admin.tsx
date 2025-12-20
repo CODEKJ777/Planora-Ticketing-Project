@@ -16,6 +16,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState<any>(null)
   const [eventFilter, setEventFilter] = useState('AKCOMSOC2025')
+  const [events, setEvents] = useState<any[]>([])
   const isAuthed = authState === 'authenticated'
 
   const search = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
@@ -65,6 +66,16 @@ export default function AdminPage() {
   }, [search, loadStats])
 
   useEffect(() => { checkSession() }, [checkSession])
+  useEffect(() => {
+    async function loadEvents() {
+      try {
+        const res = await fetch('/api/events')
+        const data = await res.json()
+        if (res.ok) setEvents(data.events || [])
+      } catch {}
+    }
+    loadEvents()
+  }, [])
   useEffect(() => { if (isAuthed) { search(); loadStats() } }, [eventFilter, isAuthed])
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
@@ -192,28 +203,15 @@ export default function AdminPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Event Tabs */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setEventFilter('AKCOMSOC2025')}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                eventFilter === 'AKCOMSOC2025'
-                  ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white'
-                  : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
-              }`}
-            >
-              AKCOMSOC 2025
-            </button>
-            <button
-              onClick={() => setEventFilter('ALL')}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                eventFilter === 'ALL'
-                  ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white'
-                  : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10'
-              }`}
-            >
-              All Events
-            </button>
+          {/* Event Selector */}
+          <div className="flex items-center gap-3">
+            <label className="text-sm text-slate-400">Event</label>
+            <select value={eventFilter} onChange={e=>setEventFilter(e.target.value)} className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white">
+              <option value="ALL">All</option>
+              {events.map(ev => (
+                <option key={ev.id} value={ev.id}>{ev.title}</option>
+              ))}
+            </select>
           </div>
 
           {/* Stats Cards */}
@@ -255,6 +253,17 @@ export default function AdminPage() {
               <Card className="p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-amber-500/20 rounded-lg">
+                    <Users className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{Math.max(0, (stats.issued || 0) - (stats.used || 0))}</div>
+                    <div className="text-xs text-slate-400">Absentees</div>
+                  </div>
+                </div>
+              </Card>
+              <Card className="p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-500/20 rounded-lg">
                     <DollarSign className="w-5 h-5 text-amber-400" />
                   </div>
                   <div>
@@ -263,7 +272,62 @@ export default function AdminPage() {
                   </div>
                 </div>
               </Card>
+              <Card className="p-4 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-indigo-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-indigo-500/20 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{stats.checkInRate}%</div>
+                    <div className="text-xs text-slate-400">Check-in Rate</div>
+                  </div>
+                </div>
+              </Card>
+              <Card className="p-4 bg-gradient-to-br from-pink-500/10 to-rose-500/10 border-pink-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-pink-500/20 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-pink-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">{stats.issueRate}%</div>
+                    <div className="text-xs text-slate-400">Issue Rate</div>
+                  </div>
+                </div>
+              </Card>
             </div>
+          )}
+          {stats?.topColleges?.length > 0 && (
+            <Card className="p-6 bg-white/5 border-white/5">
+              <h3 className="text-white font-semibold mb-3">Top Colleges</h3>
+              <ul className="text-slate-300 text-sm space-y-1">
+                {stats.topColleges.map((c: any) => (
+                  <li key={c.name} className="flex justify-between"><span>{c.name}</span><span className="text-slate-400">{c.count}</span></li>
+                ))}
+              </ul>
+            </Card>
+          )}
+
+          {stats?.dailyCounts?.length > 0 && (
+            <Card className="p-6 bg-white/5 border-white/5">
+              <h3 className="text-white font-semibold mb-3">Daily Registrations</h3>
+              <div className="flex items-end gap-1 h-32">
+                {stats.dailyCounts.map((d: any) => {
+                  const max = Math.max(...stats.dailyCounts.map((x: any) => x.count))
+                  const pct = max > 0 ? (d.count / max) * 100 : 0
+                  return (
+                    <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
+                      <div className="text-[10px] text-slate-400 font-mono">{d.count}</div>
+                      <div
+                        className="w-full bg-gradient-to-t from-violet-500 to-fuchsia-500 rounded-t"
+                        style={{ height: `${pct}%`, minHeight: '2px' }}
+                        title={`${d.day}: ${d.count}`}
+                      />
+                      <div className="text-[9px] text-slate-500 rotate-45 origin-left mt-2">{d.day.slice(5)}</div>
+                    </div>
+                  )
+                })}
+              </div>
+            </Card>
           )}
 
           <Card className="p-6 bg-white/5 border-white/5">

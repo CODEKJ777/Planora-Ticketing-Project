@@ -8,6 +8,11 @@ const BUCKET = 'ticket-templates'
 
 export const config = { api: { bodyParser: false } }
 
+/**
+ * ORGANIZER AUTHENTICATION ONLY
+ * Validates bearer token with organizer role.
+ * DO NOT accept admin session cookies or admin secrets.
+ */
 async function requireOrganizer(req: NextApiRequest) {
   const auth = req.headers.authorization
   if (!auth?.startsWith('Bearer ')) return null
@@ -18,16 +23,27 @@ async function requireOrganizer(req: NextApiRequest) {
   return null
 }
 
+/**
+ * ORGANIZER AUTHENTICATION ONLY
+ * Accepts per-event organizer secret.
+ * DO NOT accept admin session cookies or admin secrets.
+ */
 function getOrganizerSecret(req: NextApiRequest) {
   const secret = req.headers['x-organizer-secret']
-  return typeof secret === 'string' ? secret : null
+  return typeof secret === 'string' ? secret.trim() : null
 }
 
 async function ensureBucket() {
   try { await supabase.storage.createBucket(BUCKET, { public: false }) } catch {}
 }
 
+/**
+ * ORGANIZER PORTAL ENDPOINT
+ * Authentication: Bearer token (organizer role) OR x-organizer-secret ONLY
+ * DO NOT merge with admin authentication
+ */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // CRITICAL: Only organizer auth - reject admin session cookies
   const organizer = await requireOrganizer(req)
   const organizerSecret = getOrganizerSecret(req)
   if (!organizer && !organizerSecret) return res.status(401).json({ error: 'unauthorized' })

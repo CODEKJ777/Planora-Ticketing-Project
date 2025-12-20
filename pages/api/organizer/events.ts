@@ -5,6 +5,11 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_KEY || '')
 
+/**
+ * ORGANIZER AUTHENTICATION ONLY
+ * Validates bearer token with organizer role from Supabase Auth.
+ * DO NOT accept admin session cookies or admin secrets.
+ */
 async function requireOrganizer(req: NextApiRequest) {
   const auth = req.headers.authorization
   if (!auth?.startsWith('Bearer ')) return null
@@ -28,12 +33,23 @@ async function uploadCover(file: formidable.File) {
   return publicUrl
 }
 
+/**
+ * ORGANIZER AUTHENTICATION ONLY
+ * Accepts per-event organizer secret from x-organizer-secret header.
+ * DO NOT accept admin session cookies or admin secrets.
+ */
 function getOrganizerSecret(req: NextApiRequest) {
   const secret = req.headers['x-organizer-secret']
-  return typeof secret === 'string' ? secret : null
+  return typeof secret === 'string' ? secret.trim() : null
 }
 
+/**
+ * ORGANIZER PORTAL ENDPOINT
+ * Authentication: Bearer token (organizer role) OR x-organizer-secret ONLY
+ * DO NOT merge with admin authentication
+ */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // CRITICAL: Only organizer auth - reject admin session cookies
   const organizer = await requireOrganizer(req)
   const organizerSecret = getOrganizerSecret(req)
   if (!organizer && !organizerSecret) return res.status(401).json({ error: 'unauthorized' })

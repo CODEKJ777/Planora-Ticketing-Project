@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import Script from 'next/script'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import { Card } from '../../../components/ui/Card'
@@ -157,7 +158,7 @@ export default function EventCheckoutPage() {
         </Button>
       </motion.div>
 
-      <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
     </div>
   )
 }

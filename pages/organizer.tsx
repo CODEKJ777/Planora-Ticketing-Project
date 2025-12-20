@@ -22,6 +22,8 @@ export default function OrganizerDashboard() {
   const [tickets, setTickets] = useState<any[]>([])
   const [ticketsLoading, setTicketsLoading] = useState(false)
   const [ticketQuery, setTicketQuery] = useState('')
+  const [analytics, setAnalytics] = useState<any>(null)
+  const [analyticsLoading, setAnalyticsLoading] = useState(false)
 
   const filteredTickets = tickets.filter(t => {
     if (!ticketQuery.trim()) return true
@@ -124,6 +126,24 @@ export default function OrganizerDashboard() {
     }
   }
 
+  async function fetchAnalytics(eventId?: string) {
+    if (!eventId) return
+    setAnalyticsLoading(true)
+    try {
+      const headers: Record<string, string> = {}
+      if (organizerSecret) headers['x-organizer-secret'] = organizerSecret
+      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
+      const res = await fetch(`/api/organizer/analytics?eventId=${encodeURIComponent(eventId)}`, { headers })
+      const data = await res.json()
+      if (res.ok) setAnalytics(data)
+      else toast.error('Failed to load analytics')
+    } catch {
+      toast.error('Network error')
+    } finally {
+      setAnalyticsLoading(false)
+    }
+  }
+
   async function saveEvent() {
     if (!selected) return
     const form = new FormData()
@@ -180,8 +200,10 @@ export default function OrganizerDashboard() {
   useEffect(() => {
     if (selected?.id) {
       fetchTickets(selected.id)
+      fetchAnalytics(selected.id)
     } else {
       setTickets([])
+      setAnalytics(null)
     }
   }, [selected?.id])
 
@@ -279,6 +301,79 @@ export default function OrganizerDashboard() {
             )}
           </Card>
         </div>
+
+        {selected && analytics && (
+          <div className="space-y-6">
+            <Card className="p-6 bg-white/5 border-white/10">
+              <h2 className="text-xl font-bold text-white mb-4">Event Analytics</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div className="p-3 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-lg">
+                  <div className="text-xs text-slate-400 mb-1">Total</div>
+                  <div className="text-2xl font-bold text-white">{analytics.total}</div>
+                </div>
+                <div className="p-3 bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg">
+                  <div className="text-xs text-slate-400 mb-1">Issued</div>
+                  <div className="text-2xl font-bold text-white">{analytics.issued}</div>
+                </div>
+                <div className="p-3 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-lg">
+                  <div className="text-xs text-slate-400 mb-1">Pending</div>
+                  <div className="text-2xl font-bold text-white">{analytics.pending}</div>
+                </div>
+                <div className="p-3 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-lg">
+                  <div className="text-xs text-slate-400 mb-1">Revenue</div>
+                  <div className="text-xl font-bold text-white">₹{analytics.revenue?.toLocaleString()}</div>
+                </div>
+                <div className="p-3 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-lg">
+                  <div className="text-xs text-slate-400 mb-1">Check-in</div>
+                  <div className="text-2xl font-bold text-white">{analytics.checkInRate}%</div>
+                </div>
+                <div className="p-3 bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/20 rounded-lg">
+                  <div className="text-xs text-slate-400 mb-1">Issue Rate</div>
+                  <div className="text-2xl font-bold text-white">{analytics.issueRate}%</div>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4 mt-6">
+                {analytics.topColleges?.length > 0 && (
+                  <div>
+                    <h3 className="text-white font-semibold mb-2 text-sm">Top Colleges</h3>
+                    <div className="space-y-1">
+                      {analytics.topColleges.map((c: any) => (
+                        <div key={c.name} className="flex justify-between text-sm bg-white/5 rounded px-3 py-1.5">
+                          <span className="text-slate-300">{c.name}</span>
+                          <span className="text-slate-400 font-mono">{c.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {analytics.dailyCounts?.length > 0 && (
+                  <div>
+                    <h3 className="text-white font-semibold mb-2 text-sm">Daily Registrations</h3>
+                    <div className="flex items-end gap-1 h-24">
+                      {analytics.dailyCounts.map((d: any) => {
+                        const max = Math.max(...analytics.dailyCounts.map((x: any) => x.count))
+                        const pct = max > 0 ? (d.count / max) * 100 : 0
+                        return (
+                          <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
+                            <div className="text-[9px] text-slate-400 font-mono">{d.count}</div>
+                            <div
+                              className="w-full bg-gradient-to-t from-violet-500 to-fuchsia-500 rounded-t"
+                              style={{ height: `${pct}%`, minHeight: '2px' }}
+                              title={`${d.day}: ${d.count}`}
+                            />
+                            <div className="text-[8px] text-slate-500">{d.day.slice(5)}</div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
+        )}
 
         {selected && (
           <Card className="p-6 bg-white/5 border-white/10">

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createClient } from '@supabase/supabase-js'
+import { verifyOtpToken } from '../../lib/otp'
 
 const BUCKET = 'tickets'
 
@@ -13,6 +14,10 @@ function getSupabaseAdmin() {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
   const email = String(req.body?.email || '').trim().toLowerCase()
+  const otpTokenHeader = req.headers['x-otp-token']
+  const otpToken = typeof otpTokenHeader === 'string' ? otpTokenHeader : undefined
+  const v = verifyOtpToken(otpToken)
+  if (!v.ok || v.email?.toLowerCase() !== email) return res.status(401).json({ error: 'otp_required' })
   if (!email || !/.+@.+\..+/.test(email)) return res.status(400).json({ error: 'invalid_email' })
 
   try {
