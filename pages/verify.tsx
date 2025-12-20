@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Head from 'next/head'
 import { motion } from 'framer-motion'
 import { Card } from '../components/ui/Card'
@@ -67,14 +67,14 @@ export default function Verify() {
     toast.success('Logged out')
   }
 
-  function playSound(success: boolean) {
+  const playSound = useCallback((success: boolean) => {
     if (!soundEnabled) return
     const beep = new Audio()
     beep.src = success 
-      ? 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE=' 
+      ? 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE='
       : 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAABAAgAZGF0YQoGAACAgYF9e3p9f4ODgoGAgH9/gIGCg4OCgYF/f3+AgYKDg4KBgX9/f4CBgoODgoGBf39/gIGCg4OCgYF/f3+AgYKDg4KBgX9/f4CBgoODgoGBf39/gIGCg4OCgYF/f3+AgYKDg4KBgX9/f4CBgoODgoGBf39/gA=='
     beep.play().catch(() => {})
-  }
+  }, [soundEnabled])
 
   async function handleManualSearch() {
     if (!searchQuery.trim()) {
@@ -254,7 +254,7 @@ export default function Verify() {
         } catch (e) {}
       }
     }
-  }, [isAuthenticated, soundEnabled, scanning])
+  }, [isAuthenticated, soundEnabled, scanning, playSound])
 
   const handleStartScanning = async () => {
     try {
@@ -428,7 +428,7 @@ export default function Verify() {
                 Position QR code within the frame to scan
               </p>
               {!scanning && (
-                <p className="text-amber-400 text-xs text-center mt-2">Tap "Start Scan" to enable camera</p>
+                <p className="text-amber-400 text-xs text-center mt-2">Tap Start Scan to enable camera</p>
               )}
             </Card>
 

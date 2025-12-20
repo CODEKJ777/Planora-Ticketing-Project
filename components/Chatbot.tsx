@@ -12,24 +12,81 @@ type Message = {
 
 const MASCOT_GREETING = "Hi! I'm ASTRO, your event assistant! 🎉 Ask me anything about AKCOMSOC 2025, tickets, or registration!"
 
-const FAQ_RESPONSES: Record<string, string> = {
-  'akcomsoc': 'AKCOMSOC 2025 is a focused event on 5G networks and Communication IoT. Registration fee is ₹1000. You can register at /akcomsoc-2025!',
-  'price|cost|fee|rupees': 'The registration fee for AKCOMSOC 2025 is ₹1000.',
-  'payment|razorpay': 'We use Razorpay for secure payments. After registration, you\'ll receive a ticket via email with a QR code.',
-  'ticket|download|pdf': 'After payment, check your email for the ticket PDF. You can also find your tickets at /my-tickets by entering your email.',
-  'contact|help|support': 'For support, email us or visit our admin panel. We\'re here to help!',
-  'when|date|time': 'Event details including date and time will be announced soon. Stay tuned!',
-  'location|venue|where': 'Venue details will be shared with registered participants. Register now to stay updated!',
-  'ieee': 'IEEE members can enter their IEEE number during registration for verification.',
+type Intent = { id: string; keywords: string[]; response: (msg: string) => string }
+
+const INTENTS: Intent[] = [
+  {
+    id: 'akcomsoc',
+    keywords: ['akcomsoc', 'akcom', 'soc25', '2025'],
+    response: () => 'AKCOMSOC 2025 focuses on 5G networks and Communication IoT. Fee is ₹1000. Register at /akcomsoc-2025.'
+  },
+  {
+    id: 'pricing',
+    keywords: ['price', 'cost', 'fee', 'rupees', '₹', 'rs'],
+    response: () => 'Registration fee is ₹1000. Discounts may apply for IEEE members.'
+  },
+  {
+    id: 'payment',
+    keywords: ['payment', 'razorpay', 'pay', 'upi', 'card'],
+    response: () => 'Payments are processed via Razorpay. After payment, your ticket with QR is emailed instantly.'
+  },
+  {
+    id: 'ticket',
+    keywords: ['ticket', 'download', 'pdf', 'qr', 'entry pass'],
+    response: () => 'Find tickets at /my-tickets using your email, or use the emailed link. PDF download is included.'
+  },
+  {
+    id: 'support',
+    keywords: ['contact', 'help', 'support', 'issue', 'problem'],
+    response: () => 'We\'re here to help! Email support@planora.app or ask here for guidance.'
+  },
+  {
+    id: 'schedule',
+    keywords: ['when', 'date', 'time', 'schedule'],
+    response: () => 'Event schedule will be announced to registered attendees. Stay tuned!'
+  },
+  {
+    id: 'venue',
+    keywords: ['location', 'venue', 'where', 'address'],
+    response: () => 'Venue details will be shared with registrants. Register to receive updates.'
+  },
+  {
+    id: 'ieee',
+    keywords: ['ieee', 'membership'],
+    response: () => 'IEEE members can provide their number during registration for verification.'
+  }
+]
+
+const FOLLOW_UPS: Record<string, string[]> = {
+  akcomsoc: ['What\'s included?', 'How do I register?', 'Any discounts?'],
+  pricing: ['Any student discount?', 'Is GST included?'],
+  payment: ['Is UPI supported?', 'Can I pay later?'],
+  ticket: ['Where to find my ticket?', 'Can I reschedule?'],
+  support: ['Contact support', 'Report an issue'],
+  schedule: ['When does it start?', 'How long is it?'],
+  venue: ['Is parking available?', 'Exact address?'],
+  ieee: ['How to add IEEE ID?']
 }
 
-function getBotResponse(userMsg: string): string {
-  const lower = userMsg.toLowerCase()
-  for (const [pattern, response] of Object.entries(FAQ_RESPONSES)) {
-    const regex = new RegExp(pattern, 'i')
-    if (regex.test(lower)) return response
+function scoreIntent(msg: string, intent: Intent): number {
+  const text = msg.toLowerCase()
+  return intent.keywords.reduce((score, kw) => score + (text.includes(kw) ? 1 : 0), 0)
+}
+
+function getBotResponse(userMsg: string): { text: string; followUps?: string[] } {
+  let best: { intent: Intent; score: number } | null = null
+  for (const intent of INTENTS) {
+    const s = scoreIntent(userMsg, intent)
+    if (!best || s > best.score) best = { intent, score: s }
   }
-  return "I'm here to help! You can ask me about AKCOMSOC 2025, tickets, registration, pricing, or payment. What would you like to know?"
+  if (best && best.score > 0) {
+    const id = best.intent.id
+    return { text: best.intent.response(userMsg), followUps: FOLLOW_UPS[id] }
+  }
+  return {
+    text: "I'm here to help! Ask about AKCOMSOC, tickets, registration, pricing, payment, venue, or schedule.",
+    followUps: ['Ticket price', 'How to register', 'Where is the venue?']
+  }
 }
 
 export default function Chatbot() {
@@ -39,21 +96,34 @@ export default function Chatbot() {
   ])
   const [input, setInput] = useState('')
 
-  function sendMessage() {
-    const text = input.trim()
+  async function sendMessage(textOverride?: string) {
+    const text = (textOverride ?? input).trim()
     if (!text) return
     const userMsg: Message = { id: Date.now().toString(), role: 'user', text, timestamp: new Date() }
     setMessages(prev => [...prev, userMsg])
-    setInput('')
-    setTimeout(() => {
-      const botReply: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'bot',
-        text: getBotResponse(text),
-        timestamp: new Date()
+    if (!textOverride) setInput('')
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      })
+      if (res.ok) {
+        const data = await res.json()
+        const botReply: Message = { id: (Date.now() + 1).toString(), role: 'bot', text: data.text, timestamp: new Date() }
+        setMessages(prev => [...prev, botReply])
+        return
       }
-      setMessages(prev => [...prev, botReply])
-    }, 600)
+    } catch {}
+    // Fallback to local intents
+    const resp = getBotResponse(text)
+    const botReply: Message = { id: (Date.now() + 1).toString(), role: 'bot', text: resp.text, timestamp: new Date() }
+    setMessages(prev => [...prev, botReply])
+    if (resp.followUps?.length) {
+      const tips = 'Suggestions: ' + resp.followUps.map(f => `• ${f}`).join('  ')
+      const helper: Message = { id: (Date.now() + 2).toString(), role: 'bot', text: tips, timestamp: new Date() }
+      setMessages(prev => [...prev, helper])
+    }
   }
 
   return (
@@ -79,7 +149,9 @@ export default function Chatbot() {
               <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-white/10 rounded-lg transition">
                 <X className="w-4 h-4 text-slate-400" />
               </button>
+
             </div>
+              
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map(msg => (
@@ -112,11 +184,23 @@ export default function Chatbot() {
                   onKeyPress={e => e.key === 'Enter' && sendMessage()}
                 />
                 <button
-                  onClick={sendMessage}
+                  onClick={() => sendMessage()}
                   className="px-4 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-xl hover:opacity-90 transition"
                 >
                   <Send className="w-4 h-4 text-white" />
                 </button>
+              </div>
+              {/* Quick follow-up chips */}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {['Ticket price', 'How to register', 'Where is the venue?'].map((tip) => (
+                  <button
+                    key={tip}
+                    onClick={() => sendMessage(tip)}
+                    className="text-xs px-3 py-1 rounded-full border border-white/10 text-slate-300 hover:border-white/30 hover:bg-white/5"
+                  >
+                    {tip}
+                  </button>
+                ))}
               </div>
             </div>
           </motion.div>

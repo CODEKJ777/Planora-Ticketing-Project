@@ -20,8 +20,12 @@ if (url && anon) {
 	// Methods return shapes compatible with supabase-js calls used in the app.
 	supabase = {
 		auth: {
-			getUser: async () => ({ data: null }),
-			signOut: async () => ({ error: null }),
+			getUser: async () => ({ data: null, error: new Error('Supabase not configured') }),
+			getSession: async () => ({ data: { session: null }, error: new Error('Supabase not configured') }),
+			signOut: async () => ({ error: new Error('Supabase not configured') }),
+			signInWithPassword: async () => ({ data: { session: null }, error: new Error('Supabase not configured') }),
+			signUp: async () => ({ data: null, error: new Error('Supabase not configured') }),
+			resetPasswordForEmail: async () => ({ data: null, error: new Error('Supabase not configured') }),
 		},
 		from: (_table: string) => ({
 			select: async () => ({ data: null, error: null }),

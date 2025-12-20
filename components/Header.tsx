@@ -20,7 +20,7 @@ export default function Header() {
           <Link href="/events" className="text-strong hover:text-white">Events</Link>
           <Link href="/my-tickets" className="text-strong hover:text-white">My Tickets</Link>
           <Link href="/verify" className="text-strong hover:text-white">Verify</Link>
-          <Link href="/admin" className="text-strong hover:text-white">Admin</Link>
+          <Link href="/organizer" className="text-strong hover:text-white">Organizer</Link>
         </nav>
       </div>
     </header>

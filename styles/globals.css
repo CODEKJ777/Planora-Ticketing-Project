@@ -10,6 +10,13 @@
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 3, 0, 20;
     --background-end-rgb: 3, 0, 20;
+    --brand-primary: #7000ff;
+    --brand-secondary: #00c2ff;
+    --brand-accent: #ff0055;
+    --surface: rgba(255, 255, 255, 0.05);
+    --surface-strong: rgba(255, 255, 255, 0.08);
+    --border-soft: rgba(255, 255, 255, 0.12);
+    --shadow-soft: 0 20px 60px -25px rgba(0, 0, 0, 0.6);
   }
 
   body {
@@ -34,13 +41,27 @@
 
   .btn-primary {
     @apply bg-white text-black font-semibold px-6 py-3 rounded-xl transition-all duration-300 
-    hover:scale-105 active:scale-95 shadow-lg shadow-white/10 flex items-center justify-center gap-2;
+    hover:scale-105 active:scale-95 shadow-lg shadow-white/10 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50;
   }
 
   .btn-cosmic {
     @apply bg-gradient-to-r from-primary to-secondary text-white font-bold px-8 py-4 rounded-xl 
     transition-all duration-300 hover:shadow-[0_0_30px_rgba(112,0,255,0.5)] hover:scale-105 active:scale-95
-    flex items-center justify-center gap-2 uppercase tracking-wide;
+    flex items-center justify-center gap-2 uppercase tracking-wide focus:outline-none focus:ring-2 focus:ring-primary/60;
+  }
+
+  .brand-card {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .pill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-soft);
+    background: var(--surface);
   }
 
   .input-field {
@@ -64,6 +85,16 @@
   background: #374151;
 }
 
+/* Brand Design Tokens */
+:root {
+  --brand-primary: #7C3AED;
+  --brand-accent: #EC4899;
+  --brand-dark: #0F172A;
+  --brand-light: #E5E7EB;
+  --surface-hover: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(255, 255, 255, 0.1);
+}
+
 /* Animations */
 .animate-enter {
   animation: enter 0.6s ease-out forwards;
@@ -72,4 +103,23 @@
 @keyframes enter {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Themed sections */
+.section-header {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
+  color: white;
+  padding: 20px 24px;
+}
+
+.card-themed {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.card-themed:hover {
+  background: var(--surface-hover);
+  border-color: var(--brand-accent);
 }

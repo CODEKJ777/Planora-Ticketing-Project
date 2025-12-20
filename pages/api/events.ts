@@ -41,6 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const title = Array.isArray(fields.title) ? fields.title[0] : fields.title
       const description = Array.isArray(fields.description) ? fields.description[0] : fields.description
       const price = Array.isArray(fields.price) ? fields.price[0] : fields.price
+      const organizer_id = Array.isArray((fields as any).organizer_id) ? (fields as any).organizer_id[0] : (fields as any).organizer_id
       const date = Array.isArray(fields.date) ? fields.date[0] : fields.date
       const location = Array.isArray(fields.location) ? fields.location[0] : fields.location
       const coverImage = files.coverImage?.[0]
@@ -98,6 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         location: location?.trim() || null,
         price_inr: parseInt(price) || 0,
         image_url: imageUrl,
+        organizer_id: organizer_id || null,
         is_published: true,
         created_at: new Date(),
       }).select()

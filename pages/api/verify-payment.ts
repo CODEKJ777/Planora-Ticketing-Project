@@ -12,6 +12,7 @@ import { logError, logInfo, logWarn } from '../../lib/logger'
 
 const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_KEY || '')
 const BUCKET = 'tickets'
+const TEMPLATE_BUCKET = 'ticket-templates'
 
 async function ensureBucket() {
   try {
@@ -19,6 +20,32 @@ async function ensureBucket() {
   } catch (e) {
     // ignore bucket exists or insufficient permissions errors
   }
+}
+
+async function ensureTemplateBucket() {
+  try {
+    await supabase.storage.createBucket(TEMPLATE_BUCKET, { public: false })
+  } catch {}
+}
+
+async function getEventById(eventId?: string | null) {
+  if (!eventId) return null
+  const { data, error } = await supabase.from('events').select('*').eq('id', eventId).maybeSingle()
+  if (error) return null
+  return data
+}
+
+async function getTemplateConfig(eventId?: string | null) {
+  await ensureTemplateBucket()
+  if (!eventId) return null
+  const path = `templates/${eventId}.json`
+  const { data, error } = await supabase.storage.from(TEMPLATE_BUCKET).download(path)
+  if (error || !data) return null
+  try {
+    const buf = Buffer.from(await data.arrayBuffer())
+    const json = JSON.parse(buf.toString('utf-8'))
+    return json as { brandPrimary?: string; brandAccent?: string; brandDark?: string; headerTitle?: string }
+  } catch { return null }
 }
 
 async function createSignedPdfUrl(id: string, ticketId?: string) {
@@ -129,29 +156,90 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // send email with ticket link and attach PDF
     const ticketUrl = `${baseUrl}/ticket/${ticketId}`
 
-    // generate PDF in-memory
-    const doc = new PDFDocument({ size: 'A4', margin: 50 })
+    // gather event info and optional template
+    const event = await getEventById(insertedTicket?.event_id)
+    const template = await getTemplateConfig(insertedTicket?.event_id)
+
+    // generate PDF in-memory with themed colors
+    const brandPrimary = template?.brandPrimary || '#7C3AED'
+    const brandAccent = template?.brandAccent || '#EC4899'
+    const brandDark = template?.brandDark || '#0F172A'
+
+    const doc = new PDFDocument({ size: 'A4', margin: 36 })
     // collect buffer
     const buffers: any[] = []
     const stream = new PassThrough()
     stream.on('data', (chunk) => buffers.push(chunk))
 
     doc.pipe(stream)
-    doc.fontSize(20).text('Event Ticket', { align: 'center' })
-    doc.moveDown()
-    doc.fontSize(14).text(`Name: ${metadata?.name}`)
-    doc.text(`Email: ${metadata?.email}`)
-    doc.text(`Ticket ID: ${ticketId}`)
-    doc.moveDown()
+
+    // Header bar
+    doc.rect(0, 0, doc.page.width, 100).fill(brandPrimary)
+    doc.fillColor('#FFFFFF')
+      .fontSize(26)
+      .text(template?.headerTitle || 'ENTRY PASS', 36, 32, { align: 'left' })
+    doc.fontSize(12)
+      .text('Powered by PLANORA', 36, 64)
+
+    // Event block card with preview
+    doc.fillColor('#000000')
+    doc.roundedRect(36, 120, doc.page.width - 72, 160, 12).stroke(brandPrimary)
+    doc.fontSize(18).fillColor(brandDark).text('Event', 52, 132)
+    const eventTitle = event?.title || String(insertedTicket?.event_id || 'AKCOMSOC 2025')
+    doc.fontSize(22).fillColor(brandPrimary).text(eventTitle, 52, 156, { width: doc.page.width - 240, ellipsis: true })
+    doc.fontSize(12).fillColor('#64748B').text(`Ticket ID: ${ticketId}`, 52, 188)
+    if (event?.image_url) {
+      try {
+        const resp = await fetch(event.image_url)
+        const arr = await resp.arrayBuffer()
+        const imgBuf = Buffer.from(arr)
+        doc.image(imgBuf, doc.page.width - 36 - 120, 132, { width: 120, height: 80 })
+      } catch {}
+    }
+    if (event?.description) {
+      doc.fontSize(10).fillColor('#6B7280').text(String(event.description).slice(0, 140), 52, 206, { width: doc.page.width - 240 })
+    }
+
+    // Attendee info
+    const infoTop = 300
+    doc.fontSize(16).fillColor(brandDark).text('Attendee', 36, infoTop)
+    doc.moveTo(36, infoTop + 24).lineTo(doc.page.width - 36, infoTop + 24).stroke('#E5E7EB')
+    doc.fontSize(12).fillColor('#111827')
+    doc.text(`Name`, 36, infoTop + 36)
+    doc.text(`Email`, 36, infoTop + 60)
+    doc.text(`Status`, 36, infoTop + 84)
+    doc.font('Helvetica-Bold').fillColor(brandPrimary)
+    doc.text(String(metadata?.name || name), 120, infoTop + 36)
+    doc.text(String(metadata?.email || email), 120, infoTop + 60)
+    doc.fillColor('#16A34A').text('Issued', 120, infoTop + 84)
+    doc.font('Helvetica')
+
+    // QR section card
+    const qrTop = infoTop + 120
+    doc.roundedRect(36, qrTop, doc.page.width - 72, 220, 12).stroke(brandAccent)
+    doc.fontSize(16).fillColor(brandDark).text('Scan at Entry', 52, qrTop + 16)
+    doc.moveTo(52, qrTop + 40).lineTo(doc.page.width - 52, qrTop + 40).stroke('#FCE7F3')
     if (qrSvg.startsWith('data:image')) {
       try {
         const base64 = qrSvg.split(',')[1]
         if (!base64) throw new Error('Invalid base64 data')
         const img = Buffer.from(base64, 'base64')
         if (img.length === 0) throw new Error('Empty image data')
-        doc.image(img, { fit: [200, 200], align: 'center' })
+        // Place QR centered in the QR card
+        const qrSize = 180
+        const qrX = 52 + ((doc.page.width - 104 - qrSize) / 2)
+        const qrY = qrTop + 56
+        doc.image(img, qrX, qrY, { width: qrSize, height: qrSize })
+        // Below QR: helpful note
+        doc.fontSize(10).fillColor('#6B7280').text('Show this QR at entry. Do not share publicly.', 52, qrTop + 56 + qrSize + 12, { align: 'center', width: doc.page.width - 104 })
       } catch (e) { logError('pdf image error', { error: e }) }
     }
+
+    // Footer strip
+    const footerY = doc.page.height - 80
+    doc.rect(0, footerY, doc.page.width, 80).fill(brandPrimary)
+    doc.fillColor('#FFFFFF').fontSize(12).text('Need help? Contact support@planora.app', 36, footerY + 26)
+    doc.fontSize(10).text('This pass is valid for one entry. Photo ID may be required.', 36, footerY + 46)
     doc.end()
 
     await new Promise<void>((resolve) => stream.on('end', () => resolve()))
@@ -159,19 +247,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const pdfUrl = await uploadPdfAndGetUrl(ticketId, pdfBuffer, ticketId)
 
-    // send email via SMTP with inline QR and signed download link
+    // send email via SMTP with themed HTML, CTA, inline QR and PDF link
     try {
       await getMailer().sendMail({
         from: process.env.EMAIL_FROM || 'noreply@example.com',
         to: email,
-        subject: 'Your Ticket',
+        subject: 'Your Entry Pass is Ready ✅',
         html: `
-          <div style="font-family: Arial, sans-serif; font-size:14px; color:#111">
-            <p>Hi ${name},</p>
-            <p>Thanks for your purchase. Your ticket is ready — open it here: <a href="${ticketUrl}">View Ticket</a></p>
-            <p><img src="${qrSvg}" alt="QR" style="width:200px;height:200px"/></p>
-            <p>You can download a printable PDF here: <a href="${pdfUrl}">Download ticket PDF</a></p>
-            <p>Show this QR at entry.</p>
+          <div style="font-family: Outfit, Arial, sans-serif; background:#0F172A; padding:24px; color:#E5E7EB">
+            <div style="max-width:640px; margin:0 auto; background:#111827; border:1px solid rgba(255,255,255,0.1); border-radius:16px; overflow:hidden">
+              <div style="background:linear-gradient(90deg,#7C3AED,#EC4899); padding:20px 24px;">
+                <div style="color:#fff; font-weight:800; letter-spacing:.5px;">PLANORA</div>
+                <div style="color:#fff; font-size:20px; font-weight:700;">Your Entry Pass</div>
+              </div>
+              <div style="padding:24px">
+                <p style="margin:0 0 12px">Hi <strong style="color:#fff">${name}</strong>,</p>
+                <p style="margin:0 0 16px">Thanks for registering! Your entry pass is ready.</p>
+                <div style="display:flex; gap:16px; align-items:center; margin:16px 0">
+                  <img src="${qrSvg}" alt="QR" style="width:160px;height:160px;border-radius:8px; border:1px solid rgba(236,72,153,0.3)"/>
+                  <div style="flex:1">
+                    <div style="font-size:12px; color:#9CA3AF">Name</div>
+                    <div style="color:#fff; font-weight:600; margin-bottom:8px">${name}</div>
+                    <div style="font-size:12px; color:#9CA3AF">Email</div>
+                    <div style="color:#E5E7EB;">${email}</div>
+                    <div style="font-size:12px; color:#9CA3AF; margin-top:8px">Ticket ID</div>
+                    <div style="color:#C4B5FD">${ticketId}</div>
+                  </div>
+                </div>
+                <div style="margin:20px 0; text-align:center">
+                  <a href="${ticketUrl}" style="display:inline-block; background:linear-gradient(90deg,#7C3AED,#EC4899); color:#fff; text-decoration:none; padding:12px 18px; border-radius:10px; font-weight:600">View Ticket</a>
+                </div>
+                <p style="margin:0 0 12px">Prefer a printable version? <a href="${pdfUrl}" style="color:#93C5FD">Download PDF</a></p>
+                <p style="margin:0; font-size:12px; color:#9CA3AF">Show the QR at entry. Do not share publicly.</p>
+              </div>
+              <div style="background:#7C3AED; color:#fff; padding:16px 24px; font-size:12px">
+                Need help? Contact support@planora.app
+              </div>
+            </div>
           </div>
         `,
       })

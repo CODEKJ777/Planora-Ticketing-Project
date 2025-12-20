@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import Script from 'next/script'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import { Calendar, MapPin, Ticket as TicketIcon, IndianRupee } from 'lucide-react'
@@ -203,7 +204,7 @@ export default function EventRegistrationPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold text-white">Event Not Found</h1>
-          <p className="text-slate-400">The event you're looking for doesn't exist.</p>
+          <p className="text-slate-400">The event you&apos;re looking for doesn&apos;t exist.</p>
           <Button onClick={() => router.push('/events')}>Browse Events</Button>
         </div>
       </div>
@@ -214,8 +215,9 @@ export default function EventRegistrationPage() {
     <div className="min-h-screen p-6">
       <Head>
         <title>{event.title} - Registration</title>
-        <script src="https://checkout.razorpay.com/v1/checkout.js" />
       </Head>
+      {/* Load Razorpay script after interactive to avoid sync script warning */}
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
 
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Event Header */}

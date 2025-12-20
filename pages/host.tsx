@@ -14,6 +14,7 @@ type HostFormData = {
   date: string
   location: string
   price: string
+  organizerId: string
   coverImage: File | null
 }
 
@@ -26,6 +27,7 @@ export default function HostEventPage() {
     date: '',
     location: '',
     price: '',
+    organizerId: '',
     coverImage: null
   })
 
@@ -48,6 +50,7 @@ export default function HostEventPage() {
       formData.append('date', form.date)
       formData.append('location', form.location)
       formData.append('price', form.price)
+      if (form.organizerId) formData.append('organizer_id', form.organizerId)
       if (form.coverImage) {
         formData.append('coverImage', form.coverImage)
       }
@@ -64,7 +67,7 @@ export default function HostEventPage() {
 
       const data = await res.json()
       toast.success('Event created successfully!')
-      setForm({ title: '', description: '', date: '', location: '', price: '', coverImage: null })
+      setForm({ title: '', description: '', date: '', location: '', price: '', organizerId: '', coverImage: null })
       setIsOpen(false)
       
       // Redirect to event with payment
@@ -179,6 +182,17 @@ export default function HostEventPage() {
                     disabled={loading}
                     min="0"
                   />
+                </div>
+                <div>
+                  <label className="text-sm text-slate-300">Organizer Secret ID *</label>
+                  <Input
+                    placeholder="e.g., AKC-ORG-25-SECRET"
+                    value={form.organizerId}
+                    onChange={e => updateForm('organizerId', e.target.value)}
+                    className="mt-1"
+                    disabled={loading}
+                  />
+                  <p className="text-xs text-slate-500 mt-1">Keep this secret. It grants organizer access to this event.</p>
                 </div>
               <div>
                 <label className="text-sm text-slate-300">Cover Image (16:9 ratio recommended)</label>

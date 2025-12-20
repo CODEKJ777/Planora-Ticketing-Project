@@ -16,6 +16,7 @@ create table public.events (
   date timestamptz,
   image_url text, -- URL to uploaded cover image in Supabase Storage
   price_inr integer default 0,
+  organizer_id text, -- Per-event organizer secret/code used for portal access
   is_published boolean default true
 );
 
@@ -149,6 +150,7 @@ create index if not exists idx_tickets_payment_id on public.tickets(payment_id);
 create index if not exists idx_tickets_status on public.tickets(status);
 create index if not exists idx_events_published on public.events(is_published);
 create index if not exists idx_events_created_at on public.events(created_at desc);
+create index if not exists idx_events_organizer_id on public.events(organizer_id);
 
 
 -- =====================================================
