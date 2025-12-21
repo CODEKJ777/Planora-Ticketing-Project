@@ -27,13 +27,13 @@ export default function SpaceBackground() {
   }, [])
 
   return (
-    <div className="space-bg fixed inset-0 z-0 pointer-events-none" aria-hidden>
-      <div className="space-bg__gradient absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-background to-background" />
-      <div className="space-bg__stars space-bg__stars--far opacity-50" />
-      <div className="space-bg__stars space-bg__stars--near opacity-80" />
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
-      <div className="space-bg__glow absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-primary/20 rounded-full blur-[100px] animate-pulse-glow" />
-      <div className="space-bg__glow absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-secondary/10 rounded-full blur-[100px] animate-pulse-glow delay-1000" />
+    <div className="space-bg fixed inset-0 z-0 pointer-events-none select-none" aria-hidden style={{ pointerEvents: 'none' }}>
+      <div className="space-bg__gradient absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-background to-background pointer-events-none" />
+      <div className="space-bg__stars space-bg__stars--far opacity-50 pointer-events-none" />
+      <div className="space-bg__stars space-bg__stars--near opacity-80 pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
+      <div className="space-bg__glow absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-primary/20 rounded-full blur-[100px] animate-pulse-glow pointer-events-none" />
+      <div className="space-bg__glow absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-secondary/10 rounded-full blur-[100px] animate-pulse-glow delay-1000 pointer-events-none" />
     </div>
   )
 }

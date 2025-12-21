@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
+import LoadingAnimation from '../components/LoadingAnimation'
 
 const AKCOMSOC_EVENT = {
   id: 'akcomsoc-2025',
@@ -68,7 +69,9 @@ export default function EventsPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-slate-400">Loading events...</div>
+        <div className="py-20">
+          <LoadingAnimation message="Loading Events" size="lg" />
+        </div>
       ) : events.length === 0 ? (
         <div className="text-center py-12 text-slate-400">
           <p>No events available.</p>

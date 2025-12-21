@@ -7,6 +7,7 @@ import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { Plus, Calendar, Home, LogOut } from 'lucide-react'
+import LoadingAnimation from '../components/LoadingAnimation'
 
 export default function Dashboard() {
     const router = useRouter()
@@ -83,7 +84,7 @@ export default function Dashboard() {
         router.push('/login')
     }
 
-    if (loading) return <div className="p-10 text-center text-white">Loading...</div>
+    if (loading) return <LoadingAnimation message="Loading Dashboard" fullScreen />
 
     return (
         <div className="min-h-screen pb-20">

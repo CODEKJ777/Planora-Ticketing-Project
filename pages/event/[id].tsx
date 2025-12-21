@@ -8,6 +8,7 @@ import { Calendar, MapPin, Ticket as TicketIcon, IndianRupee } from 'lucide-reac
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { Card } from '../../components/ui/Card'
+import LoadingAnimation from '../../components/LoadingAnimation'
 
 declare global {
   interface Window {
@@ -34,6 +35,7 @@ export default function EventRegistrationPage() {
   const [event, setEvent] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [generatingTicket, setGeneratingTicket] = useState(false)
   
   // Form fields
   const [name, setName] = useState('')
@@ -120,6 +122,9 @@ export default function EventRegistrationPage() {
         description: `Registration for ${event.title}`,
         order_id: orderData.orderId,
         handler: async function (response: any) {
+          // Show generating ticket animation immediately
+          setGeneratingTicket(true)
+          
           try {
             const verifyRes = await fetch('/api/verify-payment', {
               method: 'POST',
@@ -141,9 +146,10 @@ export default function EventRegistrationPage() {
 
             if (verifyRes.ok) {
               const data = await verifyRes.json()
-              // Show success modal/popup
-              toast.success('🎉 Registration Successful! Check your email for ticket details.', {
-                duration: 5000,
+              
+              // Show success toast
+              toast.success('🎉 Payment Successful! Generating your ticket...', {
+                duration: 3000,
                 style: {
                   background: '#10b981',
                   color: '#fff',
@@ -155,19 +161,22 @@ export default function EventRegistrationPage() {
               // Extract ticket ID from URL
               const ticketId = data.ticketUrl?.split('/ticket/')[1] || data.ticketId
               
+              // Wait for animation then redirect
               setTimeout(() => {
                 if (ticketId) {
                   router.push(`/payment-success?ticketId=${encodeURIComponent(ticketId)}&eventId=${encodeURIComponent(event.id)}`)
                 } else {
                   router.push('/my-tickets')
                 }
-              }, 2000)
+              }, 2500)
             } else {
               const errorData = await verifyRes.json()
+              setGeneratingTicket(false)
               toast.error(`Payment verification failed: ${errorData.error || 'Unknown error'}`)
             }
           } catch (err) {
             console.error('Payment verification error:', err)
+            setGeneratingTicket(false)
             toast.error('Error verifying payment. Please contact support.')
           }
         },
@@ -192,11 +201,7 @@ export default function EventRegistrationPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-400">Loading event...</div>
-      </div>
-    )
+    return <LoadingAnimation message="Loading Event Details" fullScreen />
   }
 
   if (!event) {
@@ -218,6 +223,105 @@ export default function EventRegistrationPage() {
       </Head>
       {/* Load Razorpay script after interactive to avoid sync script warning */}
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
+
+      {/* Generating Ticket Animation Overlay */}
+      {generatingTicket && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md pointer-events-none"
+        >
+          <motion.div
+            className="text-center space-y-8"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {/* Animated Ticket Icon */}
+            <motion.div
+              className="relative mx-auto"
+              animate={{
+                rotate: [0, 5, -5, 0],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <motion.div
+                className="w-32 h-32 mx-auto rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-2xl"
+                animate={{
+                  boxShadow: [
+                    '0 0 0 0 rgba(124, 58, 237, 0.7)',
+                    '0 0 0 20px rgba(124, 58, 237, 0)',
+                  ]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                }}
+              >
+                <TicketIcon className="w-16 h-16 text-white" />
+              </motion.div>
+
+              {/* Sparkles */}
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-2 h-2 bg-yellow-400 rounded-full"
+                  style={{
+                    left: '50%',
+                    top: '50%',
+                  }}
+                  animate={{
+                    x: Math.cos((i * Math.PI) / 3) * 80,
+                    y: Math.sin((i * Math.PI) / 3) * 80,
+                    opacity: [0, 1, 0],
+                    scale: [0, 1.5, 0],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                  }}
+                />
+              ))}
+            </motion.div>
+
+            {/* Text */}
+            <div className="space-y-3">
+              <motion.h2
+                className="text-3xl font-bold text-white"
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                Generating Your Ticket...
+              </motion.h2>
+              <p className="text-slate-400">Please wait while we create your entry pass</p>
+              
+              {/* Progress Dots */}
+              <div className="flex justify-center gap-2 pt-4">
+                {[...Array(3)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="w-3 h-3 bg-violet-500 rounded-full"
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.3, 1, 0.3],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      delay: i * 0.2,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
 
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Event Header */}

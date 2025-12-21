@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { CheckCircle2, Download, Eye, Mail } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import LoadingAnimation from '../components/LoadingAnimation'
 
 export default function TicketSuccess() {
   const router = useRouter()
@@ -19,6 +20,7 @@ export default function TicketSuccess() {
       setLoading(false)
       return
     }
+        setShowAnimation(true)
 
     async function fetchTickets() {
       try {
@@ -34,8 +36,8 @@ export default function TicketSuccess() {
         const data = await res.json()
         if (res.ok && data.tickets) {
           setTickets(data.tickets)
-          // Hide animation after 2.5 seconds
-          setTimeout(() => setShowAnimation(false), 2500)
+          // Hide animation after 1.5 seconds
+          setTimeout(() => setShowAnimation(false), 1500)
         } else {
           toast.error(data.error || 'Failed to fetch tickets')
         }
@@ -62,70 +64,62 @@ export default function TicketSuccess() {
         <AnimatePresence>
           {showAnimation && (
             <motion.div
-              className="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm pointer-events-auto"
+              className="fixed inset-0 flex flex-col items-center justify-center z-50 bg-black/40 backdrop-blur-sm pointer-events-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-            <motion.div
-              className="relative"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{
-                type: 'spring',
-                stiffness: 100,
-                damping: 15,
-                duration: 0.8
-              }}
-            >
-              {/* Animated circle background */}
               <motion.div
-                className="absolute inset-0 rounded-full bg-gradient-to-r from-green-500 to-emerald-500"
+                className="flex flex-col items-center gap-8"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-              />
-
-              {/* Checkmark */}
-              <motion.div
-                className="relative z-10 w-32 h-32 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex items-center justify-center shadow-2xl"
-                animate={{
-                  boxShadow: [
-                    '0 0 0 0 rgba(16, 185, 129, 0.7)',
-                    '0 0 0 30px rgba(16, 185, 129, 0)',
-                  ]
-                }}
                 transition={{
-                  duration: 2,
-                  repeat: Infinity,
+                  type: 'spring',
+                  stiffness: 120,
+                  damping: 20,
+                  duration: 0.5
                 }}
               >
+                {/* Checkmark */}
                 <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.3, type: 'spring', stiffness: 100 }}
+                  className="relative z-10 w-32 h-32 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex items-center justify-center shadow-2xl"
+                  animate={{
+                    boxShadow: [
+                      '0 0 0 0 rgba(16, 185, 129, 0.7)',
+                      '0 0 0 30px rgba(16, 185, 129, 0)',
+                    ]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                  }}
                 >
-                  <CheckCircle2 className="w-20 h-20 text-white drop-shadow-lg" />
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 0.1, type: 'spring', stiffness: 120 }}
+                  >
+                    <CheckCircle2 className="w-20 h-20 text-white drop-shadow-lg" />
+                  </motion.div>
+                </motion.div>
+
+                {/* Text animation */}
+                <motion.div
+                  className="text-center relative z-10"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.3 }}
+                >
+                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                    Verification Successful!
+                  </h2>
+                  <p className="text-lg text-emerald-200">
+                    Your tickets are ready
+                  </p>
                 </motion.div>
               </motion.div>
             </motion.div>
-
-            {/* Text animation */}
-            <motion.div
-              className="absolute bottom-1/3 left-1/2 transform -translate-x-1/2 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                Verification Successful!
-              </h2>
-              <p className="text-lg text-emerald-200">
-                Your tickets are ready
-              </p>
-            </motion.div>
-          </motion.div>
           )}
         </AnimatePresence>
 
@@ -153,22 +147,9 @@ export default function TicketSuccess() {
 
           {/* Loading State */}
           {loading && (
-            <motion.div
-              className="flex items-center justify-center py-20"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <div className="space-y-6 w-full max-w-md">
-                {[1, 2, 3].map(i => (
-                  <motion.div
-                    key={i}
-                    className="h-32 bg-gradient-to-r from-slate-700 to-slate-600 rounded-xl"
-                    animate={{ opacity: [0.5, 0.8, 0.5] }}
-                    transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-                  />
-                ))}
-              </div>
-            </motion.div>
+            <div className="py-20">
+              <LoadingAnimation message="Loading Your Tickets" size="lg" />
+            </div>
           )}
 
           {/* Tickets Grid */}

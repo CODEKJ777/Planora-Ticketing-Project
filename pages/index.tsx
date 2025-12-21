@@ -10,27 +10,85 @@ export default function LandingPage() {
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 px-6 text-center overflow-hidden">
-                <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+                <motion.div 
+                    className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+                    animate={{
+                        rotate: [0, 360],
+                    }}
+                    transition={{
+                        duration: 60,
+                        repeat: Infinity,
+                        ease: "linear"
+                    }}
+                >
                     <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-primary to-secondary opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]" />
-                </div>
+                </motion.div>
 
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-4xl mx-auto">
-                    <h2 className="text-sm font-semibold tracking-wide text-primary uppercase">Host Your Events With Planora Tickets</h2>
-                    <h1 className="text-5xl md:text-7xl font-display font-bold text-white leading-tight">
-                        Plan. Publish. <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Engage.</span>
-                    </h1>
-                    <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+                <div className="space-y-6 max-w-4xl mx-auto">
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 20 }} 
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-sm font-semibold tracking-wide text-primary uppercase"
+                    >
+                        Host Your Events With Planora Tickets
+                    </motion.h2>
+                    
+                    <motion.h1 
+                        initial={{ opacity: 0, y: 20 }} 
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="text-5xl md:text-7xl font-display font-bold text-white leading-tight"
+                    >
+                        Plan. Publish. <motion.span 
+                            className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
+                            animate={{
+                                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                            }}
+                            transition={{
+                                duration: 5,
+                                repeat: Infinity,
+                                ease: "linear"
+                            }}
+                            style={{ backgroundSize: '200% 200%' }}
+                        >
+                            Engage.
+                        </motion.span>
+                    </motion.h1>
+                    
+                    <motion.p 
+                        initial={{ opacity: 0, y: 20 }} 
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="text-xl text-slate-300 max-w-2xl mx-auto"
+                    >
                         When planning gets effortless, great events happen. Planora Tickets has you covered with powerful tools to host, manage, and execute memorable experiences seamlessly.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+                    </motion.p>
+                    
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }} 
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.3 }}
+                        className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
+                    >
                         <Link href="/host">
-                            <Button variant="cosmic" className="h-14 px-8 text-lg">Host Now <ArrowRight className="ml-2" /></Button>
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <Button variant="cosmic" className="h-14 px-8 text-lg">Host Now <ArrowRight className="ml-2" /></Button>
+                            </motion.div>
                         </Link>
                         <Link href="/events">
-                            <Button variant="outline" className="h-14 px-8 text-lg">Explore Events</Button>
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <Button variant="outline" className="h-14 px-8 text-lg">Explore Events</Button>
+                            </motion.div>
                         </Link>
-                    </div>
-                </motion.div>
+                    </motion.div>
+                </div>
             </section>
 
             {/* Stats Grid */}
@@ -42,20 +100,38 @@ export default function LandingPage() {
                         { label: 'Active Users', value: '15k+' },
                         { label: 'Events Hosted', value: '90+' },
                     ].map((stat, i) => (
-                        <div key={i}>
-                            <div className="text-3xl font-display font-bold text-white">{stat.value}</div>
+                        <motion.div 
+                            key={i}
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: i * 0.1 }}
+                        >
+                            <motion.div 
+                                className="text-3xl font-display font-bold text-white"
+                                whileHover={{ scale: 1.1, color: '#8B5CF6' }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                            >
+                                {stat.value}
+                            </motion.div>
                             <div className="text-sm text-slate-400 uppercase tracking-widest mt-1">{stat.label}</div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </section>
 
             {/* Features Grid */}
             <section className="py-24 max-w-7xl mx-auto px-6">
-                <div className="mb-16 text-center">
+                <motion.div 
+                    className="mb-16 text-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                >
                     <h2 className="text-3xl font-display font-bold">Everything you need</h2>
                     <p className="text-slate-400 mt-2">Powerful features for modern event organizers.</p>
-                </div>
+                </motion.div>
                 <div className="grid md:grid-cols-3 gap-8">
                     {[
                         { title: 'Easy Embeddable', desc: 'Registration Widget for your own site.', icon: Calendar },
@@ -65,13 +141,26 @@ export default function LandingPage() {
                         { title: 'Automated Alerts', desc: 'WhatsApp & Email reminders included.', icon: Play },
                         { title: 'Real-time Analytics', desc: 'Track sales and check-ins live.', icon: BarChart },
                     ].map((feat, i) => (
-                        <Card key={i} className="p-8 bg-surface hover:bg-surface-hover glass-card" hoverEffect>
-                            <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-6">
-                                <feat.icon className="w-6 h-6" />
-                            </div>
-                            <h3 className="text-xl font-bold text-white mb-2">{feat.title}</h3>
-                            <p className="text-slate-400 leading-relaxed">{feat.desc}</p>
-                        </Card>
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: i * 0.1 }}
+                            whileHover={{ y: -8 }}
+                        >
+                            <Card className="p-8 bg-surface hover:bg-surface-hover glass-card h-full" hoverEffect>
+                                <motion.div 
+                                    className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-6"
+                                    whileHover={{ rotate: 360, scale: 1.1 }}
+                                    transition={{ duration: 0.6 }}
+                                >
+                                    <feat.icon className="w-6 h-6" />
+                                </motion.div>
+                                <h3 className="text-xl font-bold text-white mb-2">{feat.title}</h3>
+                                <p className="text-slate-400 leading-relaxed">{feat.desc}</p>
+                            </Card>
+                        </motion.div>
                     ))}
                 </div>
             </section>
@@ -79,58 +168,163 @@ export default function LandingPage() {
             {/* Pricing */}
             <section className="py-24 bg-black/20">
                 <div className="max-w-7xl mx-auto px-6">
-                    <h2 className="text-4xl font-display font-bold text-center mb-16">Simple Pricing</h2>
+                    <motion.h2 
+                        className="text-4xl font-display font-bold text-center mb-16"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        Simple Pricing
+                    </motion.h2>
                     <div className="grid lg:grid-cols-3 gap-8 items-start">
                         {/* Free */}
-                        <Card className="p-8 border-white/10 bg-surface">
-                            <h3 className="text-xl font-bold text-white">Free Plan</h3>
-                            <p className="text-sm text-slate-400 py-4">Perfect for small community events</p>
-                            <div className="text-4xl font-bold text-white mb-6">₹0</div>
-                            <ul className="space-y-3 mb-8 text-sm text-slate-300">
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-green-400" /> up to 300 attendees</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-green-400" /> Basic event setup</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-green-400" /> Email notifications</li>
-                            </ul>
-                            <Button variant="outline" className="w-full">Get Started</Button>
-                        </Card>
+                        <motion.div
+                            initial={{ opacity: 0, x: -50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6 }}
+                            whileHover={{ y: -10 }}
+                        >
+                            <Card className="p-8 border-white/10 bg-surface h-full">
+                                <h3 className="text-xl font-bold text-white">Free Plan</h3>
+                                <p className="text-sm text-slate-400 py-4">Perfect for small community events</p>
+                                <div className="text-4xl font-bold text-white mb-6">₹0</div>
+                                <ul className="space-y-3 mb-8 text-sm text-slate-300">
+                                    <motion.li 
+                                        className="flex gap-2"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: 0.1 }}
+                                    >
+                                        <Check className="w-4 h-4 text-green-400" /> up to 300 attendees
+                                    </motion.li>
+                                    <motion.li 
+                                        className="flex gap-2"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: 0.2 }}
+                                    >
+                                        <Check className="w-4 h-4 text-green-400" /> Basic event setup
+                                    </motion.li>
+                                    <motion.li 
+                                        className="flex gap-2"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: 0.3 }}
+                                    >
+                                        <Check className="w-4 h-4 text-green-400" /> Email notifications
+                                    </motion.li>
+                                </ul>
+                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                    <Button variant="outline" className="w-full">Get Started</Button>
+                                </motion.div>
+                            </Card>
+                        </motion.div>
 
                         {/* Standard - Featured */}
-                        <div className="relative">
-                            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary to-secondary blur-lg opacity-40" />
-                            <Card className="relative p-8 border-primary/50 bg-black/40">
-                                <div className="absolute top-0 right-0 bg-primary text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl">POPULAR</div>
+                        <motion.div 
+                            className="relative"
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            whileHover={{ y: -10, scale: 1.02 }}
+                        >
+                            <motion.div 
+                                className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary to-secondary blur-lg opacity-40"
+                                animate={{
+                                    opacity: [0.4, 0.6, 0.4],
+                                }}
+                                transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                }}
+                            />
+                            <Card className="relative p-8 border-primary/50 bg-black/40 h-full">
+                                <motion.div 
+                                    className="absolute top-0 right-0 bg-primary text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl"
+                                    animate={{
+                                        scale: [1, 1.1, 1],
+                                    }}
+                                    transition={{
+                                        duration: 2,
+                                        repeat: Infinity,
+                                    }}
+                                >
+                                    POPULAR
+                                </motion.div>
                                 <h3 className="text-xl font-bold text-white">Standard Plan</h3>
                                 <p className="text-sm text-slate-400 py-4">Essential tools for growing events</p>
                                 <div className="text-4xl font-bold text-white mb-6">4% <span className="text-lg font-normal text-slate-400">/ ticket</span></div>
                                 <ul className="space-y-3 mb-8 text-sm text-slate-300">
-                                    <li className="flex gap-2"><Check className="w-4 h-4 text-green-400" /> Everything in Free</li>
-                                    <li className="flex gap-2"><Check className="w-4 h-4 text-green-400" /> Paid ticket support</li>
-                                    <li className="flex gap-2"><Check className="w-4 h-4 text-green-400" /> Custom ticket styles</li>
-                                    <li className="flex gap-2"><Check className="w-4 h-4 text-green-400" /> Attendee profiles</li>
+                                    {['Everything in Free', 'Paid ticket support', 'Custom ticket styles', 'Attendee profiles'].map((item, idx) => (
+                                        <motion.li 
+                                            key={idx}
+                                            className="flex gap-2"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ delay: 0.1 + idx * 0.1 }}
+                                        >
+                                            <Check className="w-4 h-4 text-green-400" /> {item}
+                                        </motion.li>
+                                    ))}
                                 </ul>
-                                <Button variant="cosmic" className="w-full">Start Hosting</Button>
+                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                    <Button variant="cosmic" className="w-full">Start Hosting</Button>
+                                </motion.div>
                             </Card>
-                        </div>
+                        </motion.div>
 
                         {/* Org */}
-                        <Card className="p-8 border-white/10 bg-surface">
-                            <h3 className="text-xl font-bold text-white">Organisation</h3>
-                            <p className="text-sm text-slate-400 py-4">Centralized control for teams</p>
-                            <div className="text-4xl font-bold text-white mb-6">₹25k <span className="text-lg font-normal text-slate-400">/ year</span></div>
-                            <ul className="space-y-3 mb-8 text-sm text-slate-300">
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-green-400" /> Multiple events</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-green-400" /> Team management</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-green-400" /> Advanced analytics</li>
-                            </ul>
-                            <Button variant="outline" className="w-full">Contact Sales</Button>
-                        </Card>
+                        <motion.div
+                            initial={{ opacity: 0, x: 50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                            whileHover={{ y: -10 }}
+                        >
+                            <Card className="p-8 border-white/10 bg-surface h-full">
+                                <h3 className="text-xl font-bold text-white">Organisation</h3>
+                                <p className="text-sm text-slate-400 py-4">Centralized control for teams</p>
+                                <div className="text-4xl font-bold text-white mb-6">₹25k <span className="text-lg font-normal text-slate-400">/ year</span></div>
+                                <ul className="space-y-3 mb-8 text-sm text-slate-300">
+                                    {['Multiple events', 'Team management', 'Advanced analytics'].map((item, idx) => (
+                                        <motion.li 
+                                            key={idx}
+                                            className="flex gap-2"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ delay: 0.1 + idx * 0.1 }}
+                                        >
+                                            <Check className="w-4 h-4 text-green-400" /> {item}
+                                        </motion.li>
+                                    ))}
+                                </ul>
+                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                    <Button variant="outline" className="w-full">Contact Sales</Button>
+                                </motion.div>
+                            </Card>
+                        </motion.div>
                     </div>
                 </div>
             </section>
 
-            <footer className="py-12 border-t border-white/10 text-center text-slate-500 text-sm">
+            <motion.footer 
+                className="py-12 border-t border-white/10 text-center text-slate-500 text-sm"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+            >
                 <p>© 2025 Planora Tickets — All Rights Reserved</p>
-            </footer>
+            </motion.footer>
         </div>
     )
 }

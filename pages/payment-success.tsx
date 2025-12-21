@@ -16,6 +16,7 @@ import {
   Home
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import LoadingAnimation from '../components/LoadingAnimation'
 
 export default function PaymentSuccess() {
   const router = useRouter()
@@ -55,8 +56,8 @@ export default function PaymentSuccess() {
             }
           }
         }
-        // Hide animation after 2.5 seconds (shorter duration)
-        setTimeout(() => setShowAnimation(false), 2500)
+        // Hide animation after 1.5 seconds
+        setTimeout(() => setShowAnimation(false), 1500)
       } catch (err) {
         console.error('Error fetching data:', err)
       } finally {
@@ -106,16 +107,11 @@ export default function PaymentSuccess() {
         <AnimatePresence>
           {showAnimation && (
             <motion.div
-              className="fixed inset-0 flex flex-col items-center justify-center z-50 bg-black/50 backdrop-blur-lg pointer-events-auto"
+              className="fixed inset-0 flex flex-col items-center justify-center z-50 bg-black/50 backdrop-blur-lg pointer-events-none"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              onAnimationComplete={() => {
-                if (!showAnimation) {
-                  // Ensure overlay is gone
-                }
-              }}
             >
             {/* Animated fireworks background */}
             <motion.div
@@ -217,7 +213,7 @@ export default function PaymentSuccess() {
         </AnimatePresence>
 
         {/* Main Content */}
-        <div className={`max-w-4xl mx-auto transition-all duration-300 ${showAnimation ? 'pointer-events-none' : 'pointer-events-auto'}`}>
+        <div className="max-w-4xl mx-auto transition-all duration-300 pointer-events-auto">
           {/* Header */}
           <motion.div
             className="text-center mb-12"
@@ -240,23 +236,9 @@ export default function PaymentSuccess() {
 
           {/* Loading State */}
           {loading && (
-            <motion.div
-              className="space-y-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {/* Skeleton loader */}
-              <motion.div
-                className="h-64 bg-gradient-to-r from-slate-700 to-slate-600 rounded-2xl"
-                animate={{ opacity: [0.5, 0.8, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              />
-              <motion.div
-                className="h-40 bg-gradient-to-r from-slate-700 to-slate-600 rounded-2xl"
-                animate={{ opacity: [0.5, 0.8, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-              />
-            </motion.div>
+            <div className="py-20">
+              <LoadingAnimation message="Preparing Your Ticket Details" size="lg" />
+            </div>
           )}
 
           {/* Content Cards */}
@@ -265,12 +247,12 @@ export default function PaymentSuccess() {
               {/* Ticket Summary Card */}
               {ticket && (
                 <motion.div
-                  className="group"
+                  className="group relative"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.5 }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none" />
 
                   <div className="relative bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/50 hover:border-green-500/50 rounded-2xl p-8 backdrop-blur-sm transition-all duration-300">
                     <div className="flex items-start justify-between mb-6">
@@ -359,10 +341,11 @@ export default function PaymentSuccess() {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 pointer-events-auto">
                       <Link
                         href={`/ticket/${ticket.id}`}
-                        className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95"
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
+                        style={{ pointerEvents: 'auto' }}
                       >
                         <Eye className="w-4 h-4" />
                         View Full Ticket
@@ -373,7 +356,10 @@ export default function PaymentSuccess() {
                           ticket.pdfUrl || `/api/ticket-pdf?id=${ticket.id}`
                         }
                         download
-                        className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-700/50 hover:bg-slate-600/50 text-slate-200 font-semibold rounded-lg transition-all duration-300 border border-slate-600/50 hover:border-slate-500 transform hover:scale-105 active:scale-95"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-700/50 hover:bg-slate-600/50 text-slate-200 font-semibold rounded-lg transition-all duration-300 border border-slate-600/50 hover:border-slate-500 transform hover:scale-105 active:scale-95 cursor-pointer"
+                        style={{ pointerEvents: 'auto' }}
                       >
                         <Download className="w-4 h-4" />
                         Download PDF
@@ -386,12 +372,12 @@ export default function PaymentSuccess() {
               {/* Event Details Card */}
               {event && (
                 <motion.div
-                  className="group"
+                  className="group relative"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.5 }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none" />
 
                   <div className="relative bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/50 hover:border-blue-500/50 rounded-2xl p-8 backdrop-blur-sm transition-all duration-300">
                     <div className="mb-6">
@@ -508,7 +494,7 @@ export default function PaymentSuccess() {
 
               {/* Bottom Actions */}
               <motion.div
-                className="flex flex-col sm:flex-row gap-4 justify-center"
+                className="flex flex-col sm:flex-row gap-4 justify-center relative z-10"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.5 }}
@@ -517,7 +503,8 @@ export default function PaymentSuccess() {
                   onClick={handleShare}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-700/50 hover:bg-slate-600/50 text-slate-200 font-semibold rounded-lg transition-all border border-slate-600/50 hover:border-slate-500"
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-700/50 hover:bg-slate-600/50 text-slate-200 font-semibold rounded-lg transition-all border border-slate-600/50 hover:border-slate-500 cursor-pointer"
+                  style={{ pointerEvents: 'auto' }}
                 >
                   <Share2 className="w-4 h-4" />
                   Share
@@ -525,7 +512,8 @@ export default function PaymentSuccess() {
 
                 <Link
                   href="/"
-                  className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 active:scale-95"
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
+                  style={{ pointerEvents: 'auto' }}
                 >
                   <Home className="w-4 h-4" />
                   Back to Home
