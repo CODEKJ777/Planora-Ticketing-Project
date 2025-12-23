@@ -37,26 +37,26 @@ export default function SignUpPage() {
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center p-4">
-            <Card className="max-w-md w-full p-8 glass-card">
-                <div className="text-center mb-8">
-                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary mb-4">
-                        <Shield className="h-6 w-6" />
+            <Card className="max-w-md w-full p-4 sm:p-8 glass-card">
+                <div className="text-center mb-6 sm:mb-8">
+                    <div className="inline-flex h-10 sm:h-12 w-10 sm:w-12 items-center justify-center rounded-xl bg-primary/20 text-primary mb-3 sm:mb-4">
+                        <Shield className="h-5 sm:h-6 w-5 sm:w-6" />
                     </div>
-                    <h1 className="text-2xl font-display font-bold text-white">Create Account</h1>
-                    <p className="text-slate-400 text-sm mt-1">Join Planora Tickets to host or attend.</p>
+                    <h1 className="text-xl sm:text-2xl font-display font-bold text-white">Create Account</h1>
+                    <p className="text-slate-400 text-xs sm:text-sm mt-1">Join Planora Tickets to host or attend.</p>
                 </div>
 
-                <form onSubmit={handleSignUp} className="space-y-4">
-                    <Input label="Full Name" value={fullName} onChange={e => setFullName(e.target.value)} required placeholder="Elon Musk" />
-                    <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com" />
-                    <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" />
+                <form onSubmit={handleSignUp} className="space-y-3 sm:space-y-4">
+                    <Input label="Full Name" value={fullName} onChange={e => setFullName(e.target.value)} required placeholder="Elon Musk" className="text-sm sm:text-base" />
+                    <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com" className="text-sm sm:text-base" />
+                    <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" className="text-sm sm:text-base" />
 
-                    <Button isLoading={loading} className="w-full" variant="cosmic">
+                    <Button isLoading={loading} className="w-full text-sm sm:text-base" variant="cosmic">
                         Sign Up <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
                 </form>
 
-                <p className="mt-8 text-center text-sm text-slate-400">
+                <p className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-slate-400">
                     Already have an account? <Link href="/login" className="text-primary hover:text-primary/80 font-medium">Sign In</Link>
                 </p>
             </Card>

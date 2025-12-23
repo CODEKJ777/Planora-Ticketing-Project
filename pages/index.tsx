@@ -9,7 +9,7 @@ export default function LandingPage() {
         <div className="flex flex-col min-h-screen">
 
             {/* Hero Section */}
-            <section className="relative pt-32 pb-20 px-6 text-center overflow-hidden">
+            <section className="relative pt-20 sm:pt-24 md:pt-32 pb-16 sm:pb-20 px-4 sm:px-6 text-center overflow-hidden">
                 <motion.div 
                     className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
                     animate={{
@@ -24,12 +24,12 @@ export default function LandingPage() {
                     <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-primary to-secondary opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]" />
                 </motion.div>
 
-                <div className="space-y-6 max-w-4xl mx-auto">
+                <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }} 
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="text-sm font-semibold tracking-wide text-primary uppercase"
+                        className="text-xs sm:text-sm font-semibold tracking-wide text-primary uppercase"
                     >
                         Host Your Events With Planora Tickets
                     </motion.h2>
@@ -38,7 +38,7 @@ export default function LandingPage() {
                         initial={{ opacity: 0, y: 20 }} 
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
-                        className="text-5xl md:text-7xl font-display font-bold text-white leading-tight"
+                        className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display font-bold text-white leading-tight px-4"
                     >
                         Plan. Publish. <motion.span 
                             className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"
@@ -60,7 +60,7 @@ export default function LandingPage() {
                         initial={{ opacity: 0, y: 20 }} 
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
-                        className="text-xl text-slate-300 max-w-2xl mx-auto"
+                        className="text-base sm:text-lg md:text-xl text-slate-300 max-w-2xl mx-auto px-4"
                     >
                         When planning gets effortless, great events happen. Planora Tickets has you covered with powerful tools to host, manage, and execute memorable experiences seamlessly.
                     </motion.p>
@@ -69,22 +69,24 @@ export default function LandingPage() {
                         initial={{ opacity: 0, y: 20 }} 
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.3 }}
-                        className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
+                        className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-6 sm:pt-8 px-4"
                     >
                         <Link href="/host">
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
+                                className="w-full sm:w-auto"
                             >
-                                <Button variant="cosmic" className="h-14 px-8 text-lg">Host Now <ArrowRight className="ml-2" /></Button>
+                                <Button variant="cosmic" className="h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg w-full sm:w-auto">Host Now <ArrowRight className="ml-2" /></Button>
                             </motion.div>
                         </Link>
                         <Link href="/events">
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
+                                className="w-full sm:w-auto"
                             >
-                                <Button variant="outline" className="h-14 px-8 text-lg">Explore Events</Button>
+                                <Button variant="outline" className="h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg w-full sm:w-auto">Explore Events</Button>
                             </motion.div>
                         </Link>
                     </motion.div>
@@ -92,8 +94,8 @@ export default function LandingPage() {
             </section>
 
             {/* Stats Grid */}
-            <section className="py-12 border-y border-white/5 bg-white/5 backdrop-blur-sm">
-                <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <section className="py-8 sm:py-12 border-y border-white/5 bg-white/5 backdrop-blur-sm">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-center">
                     {[
                         { label: 'Commission', value: '100%' },
                         { label: 'Tickets Sold', value: '10k+' },
@@ -121,18 +123,18 @@ export default function LandingPage() {
             </section>
 
             {/* Features Grid */}
-            <section className="py-24 max-w-7xl mx-auto px-6">
+            <section className="py-16 sm:py-20 md:py-24 max-w-7xl mx-auto px-4 sm:px-6">
                 <motion.div 
-                    className="mb-16 text-center"
+                    className="mb-12 sm:mb-16 text-center px-4"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
                 >
-                    <h2 className="text-3xl font-display font-bold">Everything you need</h2>
-                    <p className="text-slate-400 mt-2">Powerful features for modern event organizers.</p>
+                    <h2 className="text-2xl sm:text-3xl font-display font-bold">Everything you need</h2>
+                    <p className="text-slate-400 mt-2 text-sm sm:text-base">Powerful features for modern event organizers.</p>
                 </motion.div>
-                <div className="grid md:grid-cols-3 gap-8">
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
                     {[
                         { title: 'Easy Embeddable', desc: 'Registration Widget for your own site.', icon: Calendar },
                         { title: 'Smart Discovery', desc: 'Get your event in front of thousands.', icon: Users },
@@ -166,10 +168,10 @@ export default function LandingPage() {
             </section>
 
             {/* Pricing */}
-            <section className="py-24 bg-black/20">
-                <div className="max-w-7xl mx-auto px-6">
+            <section className="py-16 sm:py-20 md:py-24 bg-black/20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6">
                     <motion.h2 
-                        className="text-4xl font-display font-bold text-center mb-16"
+                        className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-center mb-12 sm:mb-16 px-4"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -177,7 +179,7 @@ export default function LandingPage() {
                     >
                         Simple Pricing
                     </motion.h2>
-                    <div className="grid lg:grid-cols-3 gap-8 items-start">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
                         {/* Free */}
                         <motion.div
                             initial={{ opacity: 0, x: -50 }}

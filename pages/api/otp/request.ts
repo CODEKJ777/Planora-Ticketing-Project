@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import { getTransport } from '../../../lib/mailer'
+import { generateOtpVerificationEmail } from '../../../lib/emailTemplates'
 
 const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_KEY || '')
 
@@ -20,11 +21,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const transport = getTransport()
+    const emailHtml = generateOtpVerificationEmail({
+      otpCode: code
+    })
+
     await transport.sendMail({
-      from: process.env.EMAIL_FROM || 'noreply@example.com',
+      from: process.env.EMAIL_FROM || 'noreply@planora.app',
       to: email,
-      subject: 'Your OTP Code',
-      html: `<p>Your OTP code is <strong>${code}</strong>. It expires in 10 minutes.</p>`
+      subject: 'Verify Your Email - Planora Tickets',
+      html: emailHtml
     })
   } catch (e) {
     return res.status(500).json({ error: 'otp_send_failed' })

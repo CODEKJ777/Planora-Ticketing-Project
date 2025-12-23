@@ -9,6 +9,7 @@ import { PassThrough } from 'stream'
 import { insertTicketWithStatus, setTicketStatus } from '../../lib/ticketStatus'
 import { getTransport } from '../../lib/mailer'
 import { logError, logInfo, logWarn } from '../../lib/logger'
+import { generateTicketConfirmationEmail } from '../../lib/emailTemplates'
 
 const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_SERVICE_KEY || '')
 const BUCKET = 'tickets'
@@ -247,45 +248,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const pdfUrl = await uploadPdfAndGetUrl(ticketId, pdfBuffer, ticketId)
 
-    // send email via SMTP with themed HTML, CTA, inline QR and PDF link
+    // send email via SMTP with professional HTML template
     try {
+      const brandPrimary = template?.brandPrimary || '#7C3AED'
+      const brandAccent = template?.brandAccent || '#EC4899'
+      const emailHtml = generateTicketConfirmationEmail({
+        name,
+        email,
+        eventTitle: event?.title || String(insertedTicket?.event_id || 'Your Event'),
+        ticketId,
+        qrCodeUrl: qrSvg,
+        viewTicketUrl: ticketUrl,
+        pdfDownloadUrl: pdfUrl,
+        eventDate: event?.date ? new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : undefined,
+        eventLocation: event?.location,
+        eventDescription: event?.description,
+        brandPrimary,
+        brandAccent,
+        headerTitle: template?.headerTitle || 'ENTRY PASS'
+      })
+
       await getMailer().sendMail({
-        from: process.env.EMAIL_FROM || 'noreply@example.com',
+        from: process.env.EMAIL_FROM || 'noreply@planora.app',
         to: email,
-        subject: 'Your Entry Pass is Ready ✅',
-        html: `
-          <div style="font-family: Outfit, Arial, sans-serif; background:#0F172A; padding:24px; color:#E5E7EB">
-            <div style="max-width:640px; margin:0 auto; background:#111827; border:1px solid rgba(255,255,255,0.1); border-radius:16px; overflow:hidden">
-              <div style="background:linear-gradient(90deg,#7C3AED,#EC4899); padding:20px 24px;">
-                <div style="color:#fff; font-weight:800; letter-spacing:.5px;">PLANORA</div>
-                <div style="color:#fff; font-size:20px; font-weight:700;">Your Entry Pass</div>
-              </div>
-              <div style="padding:24px">
-                <p style="margin:0 0 12px">Hi <strong style="color:#fff">${name}</strong>,</p>
-                <p style="margin:0 0 16px">Thanks for registering! Your entry pass is ready.</p>
-                <div style="display:flex; gap:16px; align-items:center; margin:16px 0">
-                  <img src="${qrSvg}" alt="QR" style="width:160px;height:160px;border-radius:8px; border:1px solid rgba(236,72,153,0.3)"/>
-                  <div style="flex:1">
-                    <div style="font-size:12px; color:#9CA3AF">Name</div>
-                    <div style="color:#fff; font-weight:600; margin-bottom:8px">${name}</div>
-                    <div style="font-size:12px; color:#9CA3AF">Email</div>
-                    <div style="color:#E5E7EB;">${email}</div>
-                    <div style="font-size:12px; color:#9CA3AF; margin-top:8px">Ticket ID</div>
-                    <div style="color:#C4B5FD">${ticketId}</div>
-                  </div>
-                </div>
-                <div style="margin:20px 0; text-align:center">
-                  <a href="${ticketUrl}" style="display:inline-block; background:linear-gradient(90deg,#7C3AED,#EC4899); color:#fff; text-decoration:none; padding:12px 18px; border-radius:10px; font-weight:600">View Ticket</a>
-                </div>
-                <p style="margin:0 0 12px">Prefer a printable version? <a href="${pdfUrl}" style="color:#93C5FD">Download PDF</a></p>
-                <p style="margin:0; font-size:12px; color:#9CA3AF">Show the QR at entry. Do not share publicly.</p>
-              </div>
-              <div style="background:#7C3AED; color:#fff; padding:16px 24px; font-size:12px">
-                Need help? Contact support@planora.app
-              </div>
-            </div>
-          </div>
-        `,
+        subject: `Your Entry Pass for ${event?.title || 'the Event'} is Ready ✅`,
+        html: emailHtml,
       })
       logInfo('ticket email sent', { ticketId, email })
     } catch (emailErr) {

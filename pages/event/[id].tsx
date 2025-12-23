@@ -207,9 +207,9 @@ export default function EventRegistrationPage() {
   if (!event) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-white">Event Not Found</h1>
-          <p className="text-slate-400">The event you&apos;re looking for doesn&apos;t exist.</p>
+        <div className="text-center space-y-4 px-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Event Not Found</h1>
+          <p className="text-sm sm:text-base text-slate-400">The event you&apos;re looking for doesn&apos;t exist.</p>
           <Button onClick={() => router.push('/events')}>Browse Events</Button>
         </div>
       </div>
@@ -217,7 +217,7 @@ export default function EventRegistrationPage() {
   }
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-4 sm:p-6">
       <Head>
         <title>{event.title} - Registration</title>
       </Head>
@@ -232,7 +232,7 @@ export default function EventRegistrationPage() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md pointer-events-none"
         >
           <motion.div
-            className="text-center space-y-8"
+            className="text-center space-y-6 sm:space-y-8 px-4"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
@@ -250,7 +250,7 @@ export default function EventRegistrationPage() {
               }}
             >
               <motion.div
-                className="w-32 h-32 mx-auto rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-2xl"
+                className="w-24 h-24 sm:w-32 sm:h-32 mx-auto rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-2xl"
                 animate={{
                   boxShadow: [
                     '0 0 0 0 rgba(124, 58, 237, 0.7)',
@@ -262,7 +262,7 @@ export default function EventRegistrationPage() {
                   repeat: Infinity,
                 }}
               >
-                <TicketIcon className="w-16 h-16 text-white" />
+                <TicketIcon className="w-12 h-12 sm:w-16 sm:h-16 text-white" />
               </motion.div>
 
               {/* Sparkles */}
@@ -292,13 +292,13 @@ export default function EventRegistrationPage() {
             {/* Text */}
             <div className="space-y-3">
               <motion.h2
-                className="text-3xl font-bold text-white"
+                className="text-xl sm:text-3xl font-bold text-white"
                 animate={{ opacity: [0.7, 1, 0.7] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
                 Generating Your Ticket...
               </motion.h2>
-              <p className="text-slate-400">Please wait while we create your entry pass</p>
+              <p className="text-xs sm:text-base text-slate-400">Please wait while we create your entry pass</p>
               
               {/* Progress Dots */}
               <div className="flex justify-center gap-2 pt-4">
@@ -332,31 +332,31 @@ export default function EventRegistrationPage() {
         >
           {event.image_url && (
             <div 
-              className="h-64 rounded-2xl bg-cover bg-center"
+              className="h-40 sm:h-64 rounded-2xl bg-cover bg-center"
               style={{ backgroundImage: `url(${event.image_url})` }}
             />
           )}
           
           <div className="space-y-2">
-            <h1 className="text-4xl font-display font-bold text-white">{event.title}</h1>
-            <p className="text-slate-300 text-lg">{event.description}</p>
+            <h1 className="text-2xl sm:text-4xl font-display font-bold text-white break-words">{event.title}</h1>
+            <p className="text-sm sm:text-lg text-slate-300">{event.description}</p>
           </div>
 
-          <div className="flex flex-wrap gap-4 text-sm">
+          <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
             {event.date && (
               <div className="flex items-center gap-2 text-slate-400">
-                <Calendar className="w-4 h-4" />
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span>{new Date(event.date).toLocaleDateString()}</span>
               </div>
             )}
             {event.location && (
               <div className="flex items-center gap-2 text-slate-400">
-                <MapPin className="w-4 h-4" />
+                <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span>{event.location}</span>
               </div>
             )}
             <div className="flex items-center gap-2 text-violet-400 font-semibold">
-              <IndianRupee className="w-4 h-4" />
+              <IndianRupee className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
               <span>₹{event.price_inr}</span>
             </div>
           </div>
@@ -368,13 +368,13 @@ export default function EventRegistrationPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="p-8 bg-white/5 border-white/10">
-            <div className="flex items-center gap-3 mb-6">
-              <TicketIcon className="w-6 h-6 text-violet-400" />
-              <h2 className="text-2xl font-bold text-white">Register Now</h2>
+          <Card className="p-4 sm:p-8 bg-white/5 border-white/10">
+            <div className="flex items-center gap-3 mb-4 sm:mb-6">
+              <TicketIcon className="w-5 h-5 sm:w-6 sm:h-6 text-violet-400 flex-shrink-0" />
+              <h2 className="text-xl sm:text-2xl font-bold text-white">Register Now</h2>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
               <div>
                 <label className="text-sm text-slate-300 mb-1 block">Full Name *</label>
                 <Input
@@ -428,11 +428,11 @@ export default function EventRegistrationPage() {
                 />
               </div>
 
-              <div className="pt-4">
+              <div className="pt-3 sm:pt-4">
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full"
+                  className="w-full text-sm sm:text-base"
                   isLoading={submitting}
                 >
                   Pay ₹{event.price_inr} & Register

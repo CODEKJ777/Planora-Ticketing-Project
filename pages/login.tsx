@@ -54,26 +54,26 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center p-4">
-            <Card className="max-w-md w-full p-8 glass-card">
-                <div className="text-center mb-8">
-                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary mb-4">
-                        <Shield className="h-6 w-6" />
+            <Card className="max-w-md w-full p-4 sm:p-8 glass-card">
+                <div className="text-center mb-6 sm:mb-8">
+                    <div className="inline-flex h-10 sm:h-12 w-10 sm:w-12 items-center justify-center rounded-xl bg-primary/20 text-primary mb-3 sm:mb-4">
+                        <Shield className="h-5 sm:h-6 w-5 sm:w-6" />
                     </div>
-                    <h1 className="text-2xl font-display font-bold text-white">Welcome to Planora Tickets!</h1>
-                    <p className="text-slate-400 text-sm mt-1">Sign in to manage or attend events</p>
+                    <h1 className="text-xl sm:text-2xl font-display font-bold text-white">Welcome to Planora Tickets!</h1>
+                    <p className="text-slate-400 text-xs sm:text-sm mt-1">Sign in to manage or attend events</p>
                 </div>
 
                 {/* Method Toggle */}
-                <div className="flex p-1 bg-white/5 rounded-xl mb-6">
+                <div className="flex p-1 bg-white/5 rounded-xl mb-4 sm:mb-6">
                     <button
                         onClick={() => { setMethod('password'); setPasswordlessType(null) }}
-                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${method === 'password' ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                        className={`flex-1 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${method === 'password' ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
                     >
                         Password
                     </button>
                     <button
                         onClick={() => setMethod('passwordless')}
-                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${method === 'passwordless' ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                        className={`flex-1 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${method === 'passwordless' ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
                     >
                         Passwordless
                     </button>
@@ -87,11 +87,11 @@ export default function LoginPage() {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
                             onSubmit={handleLogin}
-                            className="space-y-4"
+                            className="space-y-3 sm:space-y-4"
                         >
-                            <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com" />
-                            <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" />
-                            <Button isLoading={loading} className="w-full" variant="cosmic">Sign In <ArrowRight className="ml-2 w-4 h-4" /></Button>
+                            <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com" className="text-sm sm:text-base" />
+                            <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" className="text-sm sm:text-base" />
+                            <Button isLoading={loading} className="w-full text-sm sm:text-base" variant="cosmic">Sign In <ArrowRight className="ml-2 w-4 h-4" /></Button>
                         </motion.form>
                     )}
 

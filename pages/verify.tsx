@@ -303,35 +303,36 @@ export default function Verify() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
+          className="w-full max-w-md px-4"
         >
-          <Card className="p-8 bg-white/5 border-white/10">
-            <div className="text-center space-y-6">
+          <Card className="p-4 sm:p-8 bg-white/5 border-white/10">
+            <div className="text-center space-y-4 sm:space-y-6">
               <div className="flex justify-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-white" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
+                  <Shield className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
                 </div>
               </div>
               
               <div>
-                <h1 className="text-3xl font-bold text-white">Security Access</h1>
-                <p className="text-slate-400 mt-2">Enter credentials to verify tickets</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">Security Access</h1>
+                <p className="text-xs sm:text-base text-slate-400 mt-1 sm:mt-2">Enter credentials to verify tickets</p>
               </div>
 
-              <form onSubmit={handleLogin} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-3 sm:space-y-4">
                 <div>
-                  <label className="text-sm text-slate-300 mb-1 block text-left">Username</label>
+                  <label className="text-xs sm:text-sm text-slate-300 mb-1 block text-left">Username</label>
                   <Input
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter username"
                     required
                     disabled={loading}
+                    className="text-sm sm:text-base"
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm text-slate-300 mb-1 block text-left">Password</label>
+                  <label className="text-xs sm:text-sm text-slate-300 mb-1 block text-left">Password</label>
                   <Input
                     type="password"
                     value={password}
@@ -339,13 +340,14 @@ export default function Verify() {
                     placeholder="Enter password"
                     required
                     disabled={loading}
+                    className="text-sm sm:text-base"
                   />
                 </div>
 
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full"
+                  className="w-full text-sm sm:text-base"
                   isLoading={loading}
                 >
                   Login
@@ -359,87 +361,90 @@ export default function Verify() {
   }
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-4 sm:p-6">
       <Head>
         <title>Verify Tickets</title>
       </Head>
 
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Header with Stats */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
-              <QrCode className="w-6 h-6 text-white" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center flex-shrink-0">
+              <QrCode className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white">Ticket Verification</h1>
-              <p className="text-slate-400 text-sm">Scan QR codes to verify attendees</p>
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-white break-words">Ticket Verification</h1>
+              <p className="text-xs sm:text-sm text-slate-400">Scan QR codes to verify attendees</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
             <Button 
               onClick={() => setSoundEnabled(!soundEnabled)} 
               variant="ghost"
-              className="px-3"
+              className="px-2 sm:px-3 py-2 h-8 sm:h-auto"
+              title={soundEnabled ? "Sound on" : "Sound off"}
             >
               {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </Button>
             {scanning ? (
-              <Button onClick={handleStopScanning} variant="outline" className="px-3">
-                <PauseCircle className="w-4 h-4 mr-1" /> Stop Scan
+              <Button onClick={handleStopScanning} variant="outline" className="px-2 sm:px-3 py-2 h-8 sm:h-auto text-xs sm:text-base">
+                <PauseCircle className="w-4 h-4 sm:mr-1" />
+                <span className="hidden xs:inline">Stop Scan</span>
               </Button>
             ) : (
-              <Button onClick={handleStartScanning} variant="primary" className="px-3">
-                <Camera className="w-4 h-4 mr-1" /> Start Scan
+              <Button onClick={handleStartScanning} variant="primary" className="px-2 sm:px-3 py-2 h-8 sm:h-auto text-xs sm:text-base">
+                <Camera className="w-4 h-4 sm:mr-1" />
+                <span className="hidden xs:inline">Start Scan</span>
               </Button>
             )}
-            <Button onClick={handleLogout} variant="ghost">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
+            <Button onClick={handleLogout} variant="ghost" className="px-2 sm:px-3 py-2 h-8 sm:h-auto text-xs sm:text-base">
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden xs:inline">Logout</span>
             </Button>
           </div>
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-3 gap-4">
-          <Card className="p-4 bg-white/5 border-white/10">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-slate-400 text-sm">Total Scans</div>
-                <div className="text-3xl font-bold text-white">{stats.total}</div>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          <Card className="p-3 sm:p-4 bg-white/5 border-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-slate-400 text-[10px] sm:text-sm">Total Scans</div>
+                <div className="text-2xl sm:text-3xl font-bold text-white">{stats.total}</div>
               </div>
-              <BarChart3 className="w-8 h-8 text-violet-400" />
+              <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-violet-400 flex-shrink-0" />
             </div>
           </Card>
 
-          <Card className="p-4 bg-green-500/10 border-green-500/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-green-400 text-sm">Valid</div>
-                <div className="text-3xl font-bold text-green-400">{stats.valid}</div>
+          <Card className="p-3 sm:p-4 bg-green-500/10 border-green-500/30">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-green-400 text-[10px] sm:text-sm">Valid</div>
+                <div className="text-2xl sm:text-3xl font-bold text-green-400">{stats.valid}</div>
               </div>
-              <CheckCircle className="w-8 h-8 text-green-400" />
+              <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-400 flex-shrink-0" />
             </div>
           </Card>
 
-          <Card className="p-4 bg-red-500/10 border-red-500/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-red-400 text-sm">Invalid</div>
-                <div className="text-3xl font-bold text-red-400">{stats.invalid}</div>
+          <Card className="p-3 sm:p-4 bg-red-500/10 border-red-500/30">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-red-400 text-[10px] sm:text-sm">Invalid</div>
+                <div className="text-2xl sm:text-3xl font-bold text-red-400">{stats.invalid}</div>
               </div>
-              <XCircle className="w-8 h-8 text-red-400" />
+              <XCircle className="w-6 h-6 sm:w-8 sm:h-8 text-red-400 flex-shrink-0" />
             </div>
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           {/* Scanner */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="p-6 bg-white/5 border-white/10">
-              <h2 className="text-xl font-bold text-white mb-4">QR Scanner</h2>
-              <div className="flex items-center justify-between mb-3 text-xs text-slate-400">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+            <Card className="p-4 sm:p-6 bg-white/5 border-white/10">
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">QR Scanner</h2>
+              <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between mb-2 sm:mb-3 text-[10px] xs:text-xs sm:text-sm text-slate-400 gap-1 xs:gap-0">
                 <span>Status: {scanning ? 'Camera active' : 'Tap Start to scan'}</span>
                 <span className="text-slate-500">Hold steady for best results</span>
               </div>
@@ -449,10 +454,10 @@ export default function Verify() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-3 p-3 rounded-lg bg-amber-500/20 border border-amber-500/50 flex items-center gap-2"
+                  className="mb-3 p-2 sm:p-3 rounded-lg bg-amber-500/20 border border-amber-500/50 flex items-center gap-2"
                 >
-                  <Clock className="w-4 h-4 text-amber-400" />
-                  <span className="text-sm text-amber-300">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm text-amber-300">
                     Scanner paused for {scanCooldown} second{scanCooldown !== 1 ? 's' : ''} - Please wait
                   </span>
                 </motion.div>
@@ -461,25 +466,26 @@ export default function Verify() {
               <div className="rounded-xl overflow-hidden border-2 border-violet-500/30 bg-black">
                 <div id="reader" style={{ width: '100%' }} />
               </div>
-              <p className="text-slate-400 text-sm mt-4 text-center">
+              <p className="text-slate-400 text-xs sm:text-sm mt-3 sm:mt-4 text-center">
                 Position QR code within the frame to scan
               </p>
               {!scanning && (
-                <p className="text-amber-400 text-xs text-center mt-2">Tap Start Scan to enable camera</p>
+                <p className="text-amber-400 text-[10px] xs:text-xs text-center mt-1 sm:mt-2">Tap Start Scan to enable camera</p>
               )}
             </Card>
 
             {/* Manual Search */}
-            <Card className="p-6 bg-white/5 border-white/10">
-              <h2 className="text-xl font-bold text-white mb-4">Manual Ticket Search</h2>
-              <div className="flex gap-3">
+            <Card className="p-4 sm:p-6 bg-white/5 border-white/10">
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Manual Ticket Search</h2>
+              <div className="flex gap-2 sm:gap-3 flex-col xs:flex-row">
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by email, name, or ID..."
                   onKeyDown={(e) => e.key === 'Enter' && handleManualSearch()}
+                  className="text-sm sm:text-base"
                 />
-                <Button onClick={handleManualSearch} isLoading={loading}>
+                <Button onClick={handleManualSearch} isLoading={loading} className="w-full xs:w-auto px-2 sm:px-4">
                   <Search className="w-4 h-4" />
                 </Button>
               </div>

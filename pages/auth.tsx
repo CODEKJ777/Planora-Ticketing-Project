@@ -21,21 +21,22 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-4">
-      <Card className="p-8 w-full max-w-md space-y-6 glass-card">
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-display font-bold">Sign In</h1>
-          <p className="text-sm text-slate-400">Access your tickets via magic link.</p>
+      <Card className="p-4 sm:p-8 w-full max-w-md space-y-4 sm:space-y-6 glass-card">
+        <div className="text-center space-y-1 sm:space-y-2">
+          <h1 className="text-xl sm:text-2xl font-display font-bold">Sign In</h1>
+          <p className="text-xs sm:text-sm text-slate-400">Access your tickets via magic link.</p>
         </div>
 
-        <form onSubmit={signInWithEmail} className="space-y-4">
+        <form onSubmit={signInWithEmail} className="space-y-3 sm:space-y-4">
           <Input
             value={email}
             onChange={e => setEmail(e.target.value)}
             placeholder="you@example.com"
             type="email"
             label="Email Address"
+            className="text-sm sm:text-base"
           />
-          <Button isLoading={loading} className="w-full" variant="cosmic">
+          <Button isLoading={loading} className="w-full text-sm sm:text-base" variant="cosmic">
             Send Login Link
           </Button>
         </form>

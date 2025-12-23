@@ -38,58 +38,58 @@ export default function TicketPage() {
 
   if (error || !ticket) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 relative z-50">
-        <Card className="p-8 bg-white/5 border-white/10 max-w-md text-center">
-          <p className="text-red-400 mb-4">{error || 'Ticket not found'}</p>
-          <Link href="/my-tickets" className="text-violet-400 hover:text-violet-300">Back to my tickets</Link>
+      <div className="min-h-screen flex items-center justify-center p-4 relative z-50">
+        <Card className="p-4 sm:p-8 bg-white/5 border-white/10 max-w-md text-center mx-4">
+          <p className="text-red-400 mb-4 text-sm sm:text-base">{error || 'Ticket not found'}</p>
+          <Link href="/my-tickets" className="text-violet-400 hover:text-violet-300 text-xs sm:text-sm">Back to my tickets</Link>
         </Card>
       </div>
     )
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8 z-[100] overflow-auto">
+    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-6 md:p-8 z-[100] overflow-auto">
       <div className="max-w-2xl mx-auto relative pointer-events-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="p-8 bg-white/5 border-white/10 pointer-events-auto">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
-                <span className="text-white text-sm font-bold">PASS</span>
+          <Card className="p-4 sm:p-8 bg-white/5 border-white/10 pointer-events-auto">
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xs sm:text-sm font-bold">PASS</span>
               </div>
-              <div>
-                <h1 className="text-2xl font-display font-bold text-white">Entry Pass</h1>
-                <p className="text-slate-400 text-sm">Ticket ID: {ticket.id}</p>
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-display font-bold text-white">Entry Pass</h1>
+                <p className="text-slate-400 text-xs sm:text-sm break-all">Ticket ID: {ticket.id}</p>
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-6 items-start">
-              <div className="rounded-xl border border-fuchsia-500/30 bg-black/60 p-4 flex items-center justify-center h-64 sm:h-auto">
+            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 items-start">
+              <div className="rounded-xl border border-fuchsia-500/30 bg-black/60 p-3 sm:p-4 flex items-center justify-center h-48 sm:h-64">
                 {ticket.qr && (
-                  <img src={ticket.qr} alt="QR code" className="w-48 h-48 rounded-md object-contain" />
+                  <img src={ticket.qr} alt="QR code" className="w-40 h-40 sm:w-48 sm:h-48 rounded-md object-contain" />
                 )}
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <div className="text-sm text-slate-400">Name</div>
-                  <div className="text-white font-semibold text-lg">{ticket.name}</div>
+                  <div className="text-xs sm:text-sm text-slate-400">Name</div>
+                  <div className="text-white font-semibold text-base sm:text-lg break-words">{ticket.name}</div>
                 </div>
 
                 <div>
-                  <div className="text-sm text-slate-400">Email</div>
-                  <div className="text-slate-200 break-all">{ticket.email}</div>
+                  <div className="text-xs sm:text-sm text-slate-400">Email</div>
+                  <div className="text-slate-200 break-all text-xs sm:text-sm">{ticket.email}</div>
                 </div>
 
                 <div>
-                  <div className="text-sm text-slate-500">Event</div>
-                  <div className="text-violet-400 font-medium">{ticket.event_id || 'AKCOMSOC 2025'}</div>
+                  <div className="text-xs sm:text-sm text-slate-500">Event</div>
+                  <div className="text-violet-400 font-medium text-sm sm:text-base">{ticket.event_id || 'AKCOMSOC 2025'}</div>
                 </div>
 
-                <div className="mt-8 space-y-3">
+                <div className="mt-6 sm:mt-8 space-y-2 sm:space-y-3">
                   <a 
                     href={ticket.pdfUrl || `/api/ticket-pdf?id=${ticket.id}`}
                     download

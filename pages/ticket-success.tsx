@@ -59,19 +59,19 @@ export default function TicketSuccess() {
         <meta name="description" content="Your tickets have been successfully verified" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-6 md:p-8">
         {/* Success Animation Overlay */}
         <AnimatePresence>
           {showAnimation && (
             <motion.div
-              className="fixed inset-0 flex flex-col items-center justify-center z-50 bg-black/40 backdrop-blur-sm pointer-events-auto"
+              className="fixed inset-0 flex flex-col items-center justify-center z-50 bg-black/40 backdrop-blur-sm pointer-events-auto px-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
               <motion.div
-                className="flex flex-col items-center gap-8"
+                className="flex flex-col items-center gap-6 sm:gap-8"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{
@@ -83,7 +83,7 @@ export default function TicketSuccess() {
               >
                 {/* Checkmark */}
                 <motion.div
-                  className="relative z-10 w-32 h-32 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex items-center justify-center shadow-2xl"
+                  className="relative z-10 w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex items-center justify-center shadow-2xl"
                   animate={{
                     boxShadow: [
                       '0 0 0 0 rgba(16, 185, 129, 0.7)',
@@ -141,7 +141,7 @@ export default function TicketSuccess() {
               </h1>
             </div>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Great! We've verified your email. Your tickets are now available for viewing and download.
+              Great! We&apos;ve verified your email. Your tickets are now available for viewing and download.
             </p>
           </motion.div>
 

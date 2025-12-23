@@ -102,7 +102,7 @@ export default function PaymentSuccess() {
         <meta name="description" content="Your event registration is complete!" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-6 md:p-8">
         {/* Success Animation Overlay */}
         <AnimatePresence>
           {showAnimation && (
@@ -173,7 +173,7 @@ export default function PaymentSuccess() {
                 />
               ))}
 
-              <div className="relative w-40 h-40 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex items-center justify-center shadow-2xl">
+              <div className="relative w-28 h-28 sm:w-40 sm:h-40 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 flex items-center justify-center shadow-2xl">
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
@@ -184,19 +184,19 @@ export default function PaymentSuccess() {
                     damping: 15
                   }}
                 >
-                  <CheckCircle2 className="w-32 h-32 text-white drop-shadow-lg" />
+                  <CheckCircle2 className="w-20 h-20 sm:w-32 sm:h-32 text-white drop-shadow-lg" />
                 </motion.div>
               </div>
             </motion.div>
 
             {/* Text animation */}
             <motion.div
-              className="text-center relative z-10"
+              className="text-center relative z-10 px-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.5 }}
             >
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-3">
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-3">
                 Registration Successful!
               </h2>
               <p className="text-xl text-emerald-200 max-w-md mx-auto">
@@ -472,7 +472,7 @@ export default function PaymentSuccess() {
                       <li className="flex gap-2">
                         <span>•</span>
                         <span>
-                          Save or print your ticket - you'll need it for entry
+                          Save or print your ticket - you&apos;ll need it for entry
                         </span>
                       </li>
                       <li className="flex gap-2">
